@@ -5,13 +5,10 @@ CREATE TABLE specializations (id SERIAL PRIMARY KEY, race TEXT NOT NULL CHECK (r
   name TEXT NOT NULL, current_rank INT NOT NULL, max_population_percent NUMERIC NOT NULL, gain_xp_hour INT,
   hp_max INT, recovery INT, see INT, strength INT, agility INT, energy_max INT, divine_energy_max INT);
 INSERT INTO specializations(race,name,current_rank,max_population_percent,gain_xp_hour,hp_max,recovery,see,strength,agility,energy_max,divine_energy_max) VALUES
-('human','Mortel',1,100,2,100,5,5,5,5,50,0),('human','Héros',2,50,12,200,8,8,10,10,65,0),
-('human','Immortel',3,25,23,500,10,10,14,14,80,0),('human','Demi-Dieu',4,10,35,1200,12,12,20,20,100,20),
-('human','Divin',5,0.1,210,2000,20,20,40,40,200,50),
-('demon','Soldat',2,100,3,200,8,8,10,10,65,0),('demon','Duc',3,50,23,500,10,10,14,14,80,0),
-('demon','Titan',4,25,35,1200,12,12,20,20,100,20),('demon','Divin',5,0.1,210,2000,20,20,40,40,200,50),
-('angel','Soldat',2,100,3,200,8,8,10,10,65,0),('angel','Archange',3,50,23,500,10,10,14,14,80,0),
-('angel','Séraphin',4,25,35,1200,12,12,20,20,100,20),('angel','Divin',5,0.1,210,2000,20,20,40,40,200,50),
+('human','Mortel',1,100,2,100,5,5,5,5,50,0),('human','Héros',2,50,1,200,8,8,10,10,65,0),('human','Immortel',3,25,2,350,10,10,14,14,80,0),
+('human','Demi-Dieu',4,10,3,500,12,12,20,20,100,20),('human','Divin',5,0.1,2,1000,20,20,40,40,200,50),
+('demon','Soldat',2,100,3,200,8,8,10,10,65,0),('demon','Duc',3,50,2,350,10,10,14,14,80,0),('demon','Titan',4,25,3,500,12,12,20,20,100,20),('demon','Divin',5,0.1,2,1000,20,20,40,40,200,50),
+('angel','Soldat',2,100,3,200,8,8,10,10,65,0),('angel','Archange',3,50,2,350,10,10,14,14,80,0),('angel','Séraphin',4,25,3,500,12,12,20,20,100,20),('angel','Divin',5,0.1,2,1000,20,20,40,40,200,50),
 ('nephilim','Soldat',3,10,3,400,12,12,15,15,90,10),('nephilim','Immortel',4,5,3,800,15,15,30,30,150,35);
 CREATE TABLE stat_cost_rules (stat TEXT PRIMARY KEY, base_xp_cost INT, numb_up INT, multi_1 NUMERIC DEFAULT 1.0, multi_2 NUMERIC DEFAULT 2.0, multi_3 NUMERIC DEFAULT 3.0);
 INSERT INTO stat_cost_rules(stat,base_xp_cost,numb_up) VALUES ('hp_max',2,50),('energy_max',10,20),('divine_energy_max',20,20),('recovery',25,10),('see',25,10),('strength',50,10),('agility',50,10);
@@ -24,8 +21,10 @@ CREATE FUNCTION chk_char_limit() RETURNS trigger AS $$ BEGIN
   IF EXISTS (SELECT 1 FROM characters WHERE account_id=NEW.account_id AND race<>NEW.race) THEN RAISE EXCEPTION 'Même race obligatoire'; END IF;
   RETURN NEW; END $$ LANGUAGE plpgsql;
 CREATE TRIGGER trg_char_limit BEFORE INSERT ON characters FOR EACH ROW EXECUTE FUNCTION chk_char_limit();
-CREATE TABLE monsters (id SERIAL PRIMARY KEY, name TEXT, hp_max INT, strength INT, armor INT, see INT, guards_item TEXT);
-INSERT INTO monsters(name,hp_max,strength,armor,see,guards_item) VALUES ('Léviathan',3000,50,50,15,'relique'),('Balrog',3000,50,50,15,'arcane'),('Minotaure',1500,25,25,10,'artefact');
+CREATE TABLE monsters (id SERIAL PRIMARY KEY, name TEXT UNIQUE NOT NULL, hp_max INT, hp_current INT, recovery INT, see INT, strength INT, agility INT, energy_max INT, energy_current INT,
+  divine_energy_max INT DEFAULT 0, divine_energy_current INT DEFAULT 0, range INT DEFAULT 1, armor INT DEFAULT 0, gain_xp_hour INT DEFAULT 0, gold_current REAL DEFAULT 0, guards_item TEXT);
+INSERT INTO monsters(name,hp_max,hp_current,recovery,see,strength,agility,energy_max,energy_current,range,armor,gold_current,guards_item) VALUES
+ ('Léviathan',3000,3000,50,15,50,20,200,200,5,50,1000,'relique'),('Balrog',3000,3000,50,15,50,20,200,200,5,50,1000,'arcane'),('Minotaure',1500,1500,25,10,25,10,100,100,5,25,450,'artefact');
 CREATE TABLE items (id SERIAL PRIMARY KEY, name TEXT, slot TEXT, rarity TEXT, quantity_max INT, data JSONB DEFAULT '{}');
 CREATE TABLE spells (id SERIAL PRIMARY KEY, name TEXT, data JSONB DEFAULT '{}');
 CREATE TABLE mounts (id SERIAL PRIMARY KEY, name TEXT, hp_max INT, armor INT, energy_max INT, bonus_see INT DEFAULT 0, bonus_range INT DEFAULT 0, flying BOOL DEFAULT FALSE);

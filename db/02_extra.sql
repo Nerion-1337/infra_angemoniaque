@@ -4,9 +4,11 @@ CREATE TABLE guilds (id SERIAL PRIMARY KEY, name TEXT UNIQUE NOT NULL, leader_id
 ALTER TABLE characters ADD COLUMN portrait TEXT, ADD COLUMN guild_id INT REFERENCES guilds(id), ADD COLUMN chest_size INT DEFAULT 10,
   ADD COLUMN resources JSONB DEFAULT '{}', ADD COLUMN last_vision_read TIMESTAMPTZ DEFAULT now(), ADD COLUMN last_guild_read TIMESTAMPTZ DEFAULT now();
 ALTER TABLE characters ADD CONSTRAINT fk_acc FOREIGN KEY (account_id) REFERENCES accounts(id);
-ALTER TABLE monsters ADD COLUMN hp_current INT; UPDATE monsters SET hp_current=hp_max;
 ALTER TABLE faiths ADD COLUMN request_choice TEXT;
-ALTER TABLE items ADD COLUMN price INT, ADD COLUMN shop BOOL DEFAULT FALSE;
+ALTER TABLE items ADD COLUMN price INT, ADD COLUMN shop BOOL DEFAULT FALSE, ADD COLUMN shop_stock INT DEFAULT 0, ADD COLUMN armor INT DEFAULT 0, ADD COLUMN strength_bonus INT DEFAULT 0,
+  ADD COLUMN agility_bonus INT DEFAULT 0, ADD COLUMN req_strength INT DEFAULT 0, ADD COLUMN weapon_damage INT DEFAULT 0;
+ALTER TABLE mounts ADD COLUMN strength INT DEFAULT 18, ADD COLUMN agility INT DEFAULT 12, ADD COLUMN recovery INT DEFAULT 10, ADD COLUMN aquatic BOOL DEFAULT FALSE,
+  ADD COLUMN special_attack_name TEXT, ADD COLUMN special_attack_damage INT DEFAULT 0, ADD COLUMN special_attack_energy INT DEFAULT 15;
 ALTER TABLE character_items ADD COLUMN in_chest BOOL DEFAULT FALSE;
 CREATE TABLE guild_folders (id SERIAL PRIMARY KEY, guild_id INT REFERENCES guilds(id), name TEXT);
 CREATE TABLE guild_topics (id SERIAL PRIMARY KEY, folder_id INT REFERENCES guild_folders(id), title TEXT, author_id INT);
@@ -32,8 +34,17 @@ INSERT INTO positions(map_id,coord_x,coord_y,building_id) SELECT v.m,v.x,v.y,b.i
 INSERT INTO positions(map_id,coord_x,coord_y,monsters_id) SELECT 2,50,50,id FROM monsters WHERE name='Léviathan';
 INSERT INTO positions(map_id,coord_x,coord_y,monsters_id) SELECT 2,150,150,id FROM monsters WHERE name='Balrog';
 INSERT INTO positions(map_id,coord_x,coord_y,monsters_id) SELECT 1,150,60,id FROM monsters WHERE name='Minotaure';
-INSERT INTO items(name,slot,rarity,quantity_max,price,shop,data) VALUES
- ('Pioche','tool','basic',9999,20,true,'{}'),('Épée courte','weapon','basic',9999,50,true,'{"strength":2}'),
- ('Parchemin de mur','scroll','basic',9999,30,true,'{"kind":"wall"}'),('Parchemin de tour','scroll','basic',9999,80,true,'{"kind":"tower"}'),
- ('Parchemin d’usine','scroll','rare',200,300,false,'{"kind":"factory"}'),('Parchemin de totem','scroll','rare',200,300,false,'{"kind":"totem"}');
-INSERT INTO mounts(name,hp_max,armor,energy_max,bonus_see,bonus_range,flying) VALUES ('Cheval',60,2,40,0,0,false),('Dragon',300,15,80,3,2,true);
+-- Objets du dépôt : équipement de départ (non vendus) + boutique de faction (avec réserve)
+INSERT INTO items(name,slot,rarity,quantity_max,price,shop,shop_stock,armor,strength_bonus,agility_bonus,req_strength,weapon_damage,data) VALUES
+ ('Épée Sanctifiée','weapon','Épique',50,NULL,false,0,0,0,0,2,3,'{}'),('Écu de la Garde','shield','Commun',9999,NULL,false,0,6,0,0,1,0,'{}'),
+ ('Casque de Fer Forgé','head','Commun',9999,NULL,false,0,4,0,0,1,0,'{}'),('Plastron du Lion','chest','Rare',500,NULL,false,0,10,0,0,2,0,'{}'),
+ ('Bottes de Célérité','foot','Rare',500,NULL,false,0,3,0,2,1,0,'{}'),('Anneau de Rubis','ring','Rare',500,NULL,false,0,0,2,0,0,0,'{}'),
+ ('Sceptre du Lien','special','Rare',100,NULL,false,0,0,0,0,0,0,'{"bonusSummons":1}'),
+ ('Pioche de Récolte','weapon','Commun',9999,80,true,12,0,0,0,1,2,'{}'),('Lance de la Milice','weapon','Commun',9999,160,true,8,0,0,0,2,3,'{}'),
+ ('Tunique Matelassée','chest','Commun',9999,120,true,10,5,0,0,1,0,'{}'),
+ ('Parchemin de mur','scroll','Commun',9999,30,true,50,0,0,0,0,0,'{"kind":"wall"}'),('Parchemin de tour','scroll','Commun',9999,80,true,30,0,0,0,0,0,'{"kind":"tower"}'),
+ ('Parchemin de navire','scroll','Rare',300,400,true,5,0,0,0,0,0,'{"kind":"ship"}'),
+ ('Parchemin d’usine','scroll','Rare',200,300,false,0,0,0,0,0,0,'{"kind":"factory"}'),('Parchemin de totem','scroll','Rare',200,300,false,0,0,0,0,0,0,'{"kind":"totem"}');
+INSERT INTO mounts(name,hp_max,armor,energy_max,bonus_see,bonus_range,flying,aquatic,strength,agility,recovery,special_attack_name,special_attack_damage,special_attack_energy) VALUES
+ ('Dragon de Rubis Ancien',450,20,120,2,2,true,false,18,12,15,'Cracher du feu',65,15),('Destrier Céleste Cuirassé',220,12,90,1,1,false,false,14,12,10,NULL,0,15),
+ ('Hippocampe des Abysses',180,8,100,1,0,false,true,14,14,12,NULL,0,15),('Navire',150,5,100,1,0,false,true,10,6,8,NULL,0,15);

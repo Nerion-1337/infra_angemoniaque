@@ -1,1 +1,2 @@
-docker compose --env-file .env.example config -q
+#!/bin/sh
+for f in dev prod; do docker compose -f docker-compose.$f.yml --env-file .env.example config -q || exit 1; done

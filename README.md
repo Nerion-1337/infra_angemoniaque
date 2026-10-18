@@ -1,6 +1,8 @@
-# angemoniaque-infra
-Prérequis : Docker + Docker Compose. Aucun Node/npm sur la machine.
-    cd infra && cp .env.example .env
-    docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build   # dev (hot reload)  -> http://localhost
-    docker compose up -d --build                                                    # prod
-Tests : `docker build --target test ../backend` / `../frontend` · Hooks : `git config core.hooksPath .githooks` dans chaque dépôt.
+# angemoniaque-infra — DEV et PROD indépendants (aucun Node sur l'hôte)
+| | DEV (`-f docker-compose.dev.yml`) | PROD (`-f docker-compose.prod.yml`) |
+|---|---|---|
+| Projet / conteneurs | angemoniaque-dev / ange-dev-* | angemoniaque-prod / ange-prod-* |
+| Jeu | http://localhost:8080 | http://localhost |
+| PgAdmin / Postgres | :5051 / :5433 | :5050 / interne |
+| Données | volume pgdata_dev | volume pgdata |
+Ils peuvent tourner en même temps sans s'écraser. `cp .env.example .env` d'abord. Commandes : voir Makefile.
