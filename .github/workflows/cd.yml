@@ -1,0 +1,9 @@
+name: infra-cd
+on: { push: { tags: ["v*"] } }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: appleboy/ssh-action@v1
+        with: { host: "${{ secrets.HOST }}", username: "${{ secrets.USER }}", key: "${{ secrets.SSH_KEY }}",
+                script: "cd /srv/angemoniaque/infra && git pull && docker compose pull && docker compose up -d --build" }
