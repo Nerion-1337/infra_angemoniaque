@@ -1,0 +1,4 @@
+{
+  "test_cmd": "bash -n scripts/check-sql.sh && bash -n scripts/backup-db.sh && /opt/agent-tools/venv/bin/python -c \"import yaml,glob; [yaml.safe_load(open(f)) for f in glob.glob(\\\"docker-compose*.yml\\\")]; print(\\\"infra: syntax OK\\\")\"",
+  "backend": "hash"
+}
