@@ -26,3 +26,7 @@ ALTER TABLE messages ADD COLUMN subject TEXT;
 -- ===== Pactes sur demande : l'autre partie doit accepter ; plusieurs demandes envoyées et reçues =====
 ALTER TABLE pacts ADD COLUMN requested_by INT REFERENCES characters(id), ADD COLUMN status TEXT DEFAULT 'active';
 ALTER TABLE pacts ALTER COLUMN active SET DEFAULT FALSE; ALTER TABLE pacts ADD CONSTRAINT uq_pact_pair UNIQUE (ethereal_id, human_id);
+
+-- ===== Équipement : verrou de 12 h par pièce ; armure physique / magique =====
+ALTER TABLE character_items ADD COLUMN equipped_at TIMESTAMPTZ;
+ALTER TABLE monsters ADD COLUMN magic_armor INT DEFAULT 0; ALTER TABLE summons ADD COLUMN magic_armor INT DEFAULT 0;

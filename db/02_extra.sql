@@ -6,7 +6,7 @@ ALTER TABLE characters ADD COLUMN portrait TEXT, ADD COLUMN guild_id INT REFEREN
 ALTER TABLE characters ADD CONSTRAINT fk_acc FOREIGN KEY (account_id) REFERENCES accounts(id);
 ALTER TABLE faiths ADD COLUMN request_choice TEXT;
 ALTER TABLE items ADD COLUMN price INT, ADD COLUMN shop BOOL DEFAULT FALSE, ADD COLUMN shop_stock INT DEFAULT 0, ADD COLUMN armor INT DEFAULT 0, ADD COLUMN strength_bonus INT DEFAULT 0,
-  ADD COLUMN agility_bonus INT DEFAULT 0, ADD COLUMN req_strength INT DEFAULT 0, ADD COLUMN weapon_damage INT DEFAULT 0;
+  ADD COLUMN agility_bonus INT DEFAULT 0, ADD COLUMN req_strength INT DEFAULT 0, ADD COLUMN weapon_damage INT DEFAULT 0, ADD COLUMN magic_armor INT DEFAULT 0;
 ALTER TABLE mounts ADD COLUMN strength INT DEFAULT 18, ADD COLUMN agility INT DEFAULT 12, ADD COLUMN recovery INT DEFAULT 10, ADD COLUMN aquatic BOOL DEFAULT FALSE,
   ADD COLUMN special_attack_name TEXT, ADD COLUMN special_attack_damage INT DEFAULT 0, ADD COLUMN special_attack_energy INT DEFAULT 15;
 ALTER TABLE character_items ADD COLUMN in_chest BOOL DEFAULT FALSE;
@@ -45,6 +45,7 @@ INSERT INTO items(name,slot,rarity,quantity_max,price,shop,shop_stock,armor,stre
  ('Parchemin de mur','scroll','Commun',9999,30,true,50,0,0,0,0,0,'{"kind":"wall"}'),('Parchemin de tour','scroll','Commun',9999,80,true,30,0,0,0,0,0,'{"kind":"tower"}'),
  ('Parchemin de navire','scroll','Rare',300,400,true,5,0,0,0,0,0,'{"kind":"ship"}'),
  ('Parchemin d’usine','scroll','Rare',200,300,false,0,0,0,0,0,0,'{"kind":"factory"}'),('Parchemin de totem','scroll','Rare',200,300,false,0,0,0,0,0,0,'{"kind":"totem"}');
+INSERT INTO items(name,slot,rarity,quantity_max,price,shop,shop_stock,armor,magic_armor,req_strength,data) VALUES ('Robe de Lumière','chest','Rare',300,140,true,6,2,8,1,'{}');
 INSERT INTO mounts(name,hp_max,armor,energy_max,bonus_see,bonus_range,flying,aquatic,strength,agility,recovery,special_attack_name,special_attack_damage,special_attack_energy) VALUES
  ('Dragon de Rubis Ancien',450,20,120,2,2,true,false,18,12,15,'Cracher du feu',65,15),('Destrier Céleste Cuirassé',220,12,90,1,1,false,false,14,12,10,NULL,0,15),
  ('Hippocampe des Abysses',180,8,100,1,0,false,true,14,14,12,NULL,0,15),('Navire',150,5,100,1,0,false,true,10,6,8,NULL,0,15);
