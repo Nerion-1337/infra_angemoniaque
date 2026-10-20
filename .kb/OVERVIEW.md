@@ -17,13 +17,14 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - kb : backend d'embedding `hash` (offline) dans `.kb/config.json`
 
 ## Features (1)
-- **docker-infrastructure** [done] (.kb/cards/docker-infrastructure.md) Docker orchestration: dev/prod stacks, Nginx proxy, Postgres migrations — Orchestrates the whole project on Docker: three compose targets (base, dev, prod) defining Postgres 16, Redis 7, the backend and frontend containers, an Nginx reverse proxy and ops tools (PgAdmin, Por — files: docker-compose.yml, docker-compose.dev.yml, docker-compose.prod.yml, nginx/nginx.conf (+9)
+- **docker-infrastructure** [done] (.kb/cards/docker-infrastructure.md) Docker orchestration: dev/prod stacks, Nginx proxy, Postgres migrations — Orchestrates the whole project on Docker: three compose targets (base, dev, prod) defining Postgres 16, Redis 7, the backend and frontend containers, an Nginx reverse proxy and ops tools (PgAdmin, Por — files: docker-compose.yml, docker-compose.dev.yml, docker-compose.prod.yml, nginx/nginx.conf (+10)
 
 ## File map
 - `db/01_init.sql`
 - `db/02_extra.sql`
 - `db/03_features.sql`
 - `db/04_guild_order.sql`
+- `db/05_rank_order.sql`
 - `docker-compose.dev.yml` — DEV — projet "angemoniaque-dev" : conteneurs ange-dev-*, base/volumes/réseau séparés de la prod, ports différe
 - `docker-compose.prod.yml` — PROD — projet "angemoniaque-prod" : conteneurs ange-prod-*, volumes et réseau propres, images :prod
 - `docker-compose.yml` — Dépôt infra : orchestre TOUT (db, cache, back, front, proxy, outils). Les dépôts backend/ et frontend/ sont cl
