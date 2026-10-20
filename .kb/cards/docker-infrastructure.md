@@ -14,6 +14,7 @@ files:
   - db/03_features.sql
   - db/04_guild_order.sql
   - db/05_rank_order.sql
+  - db/06_default_rank.sql
   - scripts/check-sql.sh
   - scripts/backup-db.sh
   - Makefile
@@ -28,6 +29,7 @@ symbols:
   - db/03_features.sql:summons
   - db/04_guild_order.sql:sort_order
   - db/05_rank_order.sql:sort_order
+  - db/06_default_rank.sql:default_rank_id
   - scripts/check-sql.sh:ON_ERROR_STOP
   - scripts/backup-db.sh:pg_dump
   - Makefile:dev-up
@@ -43,7 +45,7 @@ Orchestrates the whole project on Docker: three compose targets (base, dev, prod
 - `docker-compose.dev.yml` overlays project `angemoniaque-dev` (containers `ange-dev-*`): separate volumes `pgdata_dev` + named `*_modules_dev` volumes for node_modules, exposed ports 8080 (game) / 5433 (postgres) / 5051 (PgAdmin); sources are bind-mounted and node_modules stay in named volumes so the host never sees dependencies; backend runs the Dockerfile `dev` target (`npm run dev`, hot reload with `CHOKIDAR_USEPOLLING`), frontend the Vite dev server on 5173.
 - `docker-compose.prod.yml` overlays project `angemoniaque-prod` (containers `ange-prod-*`): single `pgdata` volume, `:prod` image targets, nginx serves the static frontend build and proxies the API on port 80, plus PgAdmin (:5050) and Portainer (:9000).
 - `nginx/nginx.conf` (prod): `/api/` → `http://backend:3000/` (prefix stripped) with WebSocket upgrade headers; `/` → `http://frontend:80` (static dist). `nginx/nginx.dev.conf` is identical except `/` → `http://frontend:5173` (Vite HMR).
-- Migrations run in lexicographic order on first start of an empty volume: `01_init.sql` creates `game_schema` (maps, specializations, stat_cost_rules, characters, …), `02_extra.sql` adds accounts/guilds/guild forum and item/mount columns, `03_features.sql` adds summons, controlled summons and spells, `04_guild_order.sql` adds `sort_order` to the guild forum tables (category/topic reordering, back `POST /guilds/reorder`), `05_rank_order.sql` adds `sort_order` to `guild_ranks` (rank-card reordering in the manage tab, back `POST /guilds/reorder` with `kind: 'ranks'`).
+- Migrations run in lexicographic order on first start of an empty volume: `01_init.sql` creates `game_schema` (maps, specializations, stat_cost_rules, characters, …), `02_extra.sql` adds accounts/guilds/guild forum and item/mount columns, `03_features.sql` adds summons, controlled summons and spells, `04_guild_order.sql` adds `sort_order` to the guild forum tables (category/topic reordering, back `POST /guilds/reorder`), `05_rank_order.sql` adds `sort_order` to `guild_ranks` (rank-card reordering in the manage tab, back `POST /guilds/reorder` with `kind: 'ranks'`), `06_default_rank.sql` adds `default_rank_id` to `guilds` (default rank for newcomers, back `POST /guilds/default-rank`).
 - `scripts/check-sql.sh` re-applies `db/*.sql` in order on a fresh database with `ON_ERROR_STOP=1` and smoke-selects `game_schema.specializations`; `scripts/backup-db.sh [dev|prod]` pg_dumps the running postgres container to a timestamped SQL file.
 - `Makefile` is the single entry point: `dev-up/dev-down/dev-reset/dev-logs/dev-deps`, `test-back/test-front` (build the Dockerfile `test` target), `test-int` (integration tests inside the dev stack), `prod-up/prod-down/prod-logs`.
 
@@ -66,7 +68,7 @@ Orchestrates the whole project on Docker: three compose targets (base, dev, prod
 
 ## Gotchas
 - Migrations only run when the Postgres data volume is empty: any schema change in `db/` requires `make dev-reset` (drops `pgdata_dev`) in dev; prod needs a manual migration path — adding a file does NOT alter existing volumes.
-- `db/*.sql` must stay in lexicographic order; `02_extra.sql`, `03_features.sql`, `04_guild_order.sql` and `05_rank_order.sql` ALTER tables created by `01_init.sql` — renumbering or reordering breaks a fresh init.
+- `db/*.sql` must stay in lexicographic order; `02_extra.sql`, `03_features.sql`, `04_guild_order.sql`, `05_rank_order.sql` and `06_default_rank.sql` ALTER tables created by `01_init.sql` — renumbering or reordering breaks a fresh init.
 - `BACKEND_PATH` / `FRONTEND_PATH` (default `../backend`, `../frontend`) assume the repos are checked out side-by-side; relocate and export the variables.
 - Dev and prod run in parallel by design (separate compose projects, ports and volumes) — do not reuse dev ports in prod or vice versa.
 - Absolute rule: this repo must never modify `../front` or `../back`; if an app-side change is needed to adapt to the infra, document it and report it instead.
