@@ -6,6 +6,7 @@ updated: 2026-10-21
 files:
   - db/01_init.sql
   - db/02_extra.sql
+  - db/08_world.sql
 symbols:
   - db/01_init.sql:maps
   - db/01_init.sql:positions
@@ -15,28 +16,27 @@ tests:
   - scripts/check-sql.sh
 ---
 ## Purpose
-The static world of the game in Postgres (`game_schema`): the three maps (dimensions only — the terrain itself is procedural, computed by `back/src/game/terrain.ts`, nothing per-cell is stored), the single `positions` table that places EVERY entity (character, monster, summon, building, mount, dropped item) on a map cell, the per-character `resources` JSONB (harvested `perle/eau/herbe/bois/pierre`), the invulnerable buildings (capitals + inter-world doors), and the population limits that keep the world bounded.
+The PostgreSQL baseline: `db/01_init.sql` (schema + seed data) and `db/02_extra.sql` (extra columns/features), plus the feature migrations that follow it (guild order, ranks, forum, world v2). All of it is read by the back (`back/src/routes/*`), and its **order and idempotency** are part of the contract.
 
 ## How it works
-- `maps` (01_init): `id, name_file, width, height` with 3 rows — `humains.map` 200×200, `anges_demons.map` 200×200, `morts.map` 100×100. Only dimensions + name: the cell content (kind/cost/resource) is a pure function of coordinates (back card `map-terrain-gather`), so maps never need per-cell rows. Map 3 (morts) is the dead-heroes parking lot (back `die()` repositions there).
-- `positions` (01_init): one table, polymorphic rows — exactly one of `character_id/monsters_id/building_id/mount_id/item_id` is set (`chk_exclusive_entity` via `num_nonnulls(…)=1`), 01_init `UNIQUE uq_pos_char` on `character_id` (one spot per character), and 02_extra `UNIQUE uq_cell ON positions(map_id,coord_x,coord_y) WHERE item_id IS NULL` → **the database itself guarantees one entity per cell** (dropped items are exempt: many items can share a cell). This is why back never has a race on cell occupancy: a duplicate insert dies with PG `23505`, translated to `409 'Déjà existant ou case occupée'` in `app.onError`.
-- `characters.resources` JSONB `DEFAULT '{}'` (02_extra): the harvest ledger `{herbe: 3, bois: 1, …}` updated by `jsonb_set(…)+1` on `/actions/gather` (back card `map-terrain-gather`); read back by `GET /inventory/{characterId}`. It is a plain JSONB bag — no schema inside, keys = resource names, values = counts.
-- Seeded static world (02_extra): 6 invulnerable buildings — 3 capitals (`Hôtel de ville` map 1 @100,100; `Bastion Infernal` + `Sanctuaire de la Providence` map 2) and 3 doors linking the worlds (`Le Seuil des Deux Voiles` map 1 → map 2 @12,10 needs an `artefact`; `Brèche de Soufre` map 2 → map 1 @12,10 needs `arcane`; `L'Arche de Grâce` map 2 → map 1 @22,10 needs `relique` — `data.requires` = the divine-item kind, `data.to = [map,x,y]`), the 3 world-guarding monsters placed (`Léviathan` map 2 @50,50, `Balrog` map 2 @150,150, `Minotaure` map 1 @150,60), and `divine_items` (4 reliques + 4 arcane + 5 artefacts, each `guardian_monster_id` — monsters drop them on kill, doors consume them via `POST /divine/door`).
-- `chk_char_limit` trigger (01_init): BEFORE INSERT on `characters` — max **3 characters per account, same race** (`RAISE EXCEPTION '3 personnages max' / 'Même race obligatoire'` → back maps PG `P0001` to `400`).
+- `01_init.sql`: schema `game_schema` (`search_path` set per connection), the core tables (`users`, `characters`, `accounts`, `characters.resources` JSONB…), the `positions` table (one row per occupied cell, `item_id` distinguishes entities), `maps` (200×200, world 1 = Humans with the safe zone), the `checks` that gate races/summons, the `chk_char_limit` (3 characters per account, same race) and the seed data (races, items, a first village with a portal).
+- `02_extra.sql`: adds `characters.resources` JSONB, the `capitals` and `doors` building kinds, the `buildings` seed (a portal + a door per world), and the `monsters` table with its spawn points.
+- Feature migrations follow numerically (`03_features.sql`, `04_guild_order.sql`, `05_rank_order.sql`, `06_default_rank.sql`, `07_forum_perms.sql`, `08_world.sql`) — all `CREATE TABLE IF NOT EXISTS` / `ADD COLUMN IF NOT EXISTS`, re-runnable on an existing dev DB. The files are **lexicographic**: a new `04_*.sql` migration lands **after** `03_features.sql` but **before** the forum `07` — check the sort order before naming a new file.
+- `08_world.sql` (world v2): `characters.burn_until` (volcano burn, hourly tick of `BURN_DAMAGE`), the 4 portals of the Human world (all `kind='artefact'`, `Le Seuil des Deux Voiles`/`Portail de Givre`/`Porte des Dunes`/`Passage des Marais`, coordinates in sync with `FEATURES` of the back `humanMap`), the return portal moved into the safe zone (next to the town hall), and the Minotaure tree relocated to (146, 68).
 
 ## Entry points
-- Postgres entrypoint applies `db/*.sql` in lexicographic order on an **empty** volume only (infra card `docker-infrastructure`) — `01_init` then `02_extra`; renumbering or reordering breaks a fresh init (`02_extra` ALTERs `01_init` tables).
-- All world writes go through back (`positions` in `movement.travel` / `spawn.freeCell` / combat deaths; `resources` in `actions.gather`); the infra repo only ships the schema + seeds. The back integration tests (`back/test/integration/map-gather.test.ts` etc.) are the de-facto tests of this schema, run against a freshly-initiated Postgres.
+- Postgres: every `db` container of the repo applies `db/0*.sql` in lexicographic order on first boot; the back connects with `search_path=game_schema`.
+- The back's `routes/*` assumes the columns from `02_extra.sql` (e.g. `characters.resources`), and `game/burn.ts` + `routes/tick.ts` assume `08_world.sql` (`burn_until`).
 
 ## Data flow
-Reads/writes live in `game_schema` (`search_path=game_schema` set by the back pool — every query is unqualified). Entity placement: `positions` row ↔ exactly one entity; a character's row moves on every successful travel. Harvests: `characters.resources` JSONB += 1. Doors: `buildings.data` JSON (`requires`/`to`) consumed by `routes/divine.ts`; `divine_items` holder moves to the killer (`holder_character_id`) and back to the guarded state on door use. No triggers on `positions` (occupancy is purely the `uq_cell` unique index), no FKs from `positions` to `summons` (summoned placements use their own `summon_id` column added in `03_features`).
+Reads: the back `db` pool (single source of truth for characters, positions, buildings); the infra also owns the nginx front/back proxies and the Redis config — but the **schema is here**. Writes: migrations are only ever run by a human (`stack` / psql); the back itself writes into the game tables but never into `db/`.
 
 ## Tests
-No SQL test suite in infra (the registered `test_cmd` only syntax-validates scripts + compose files). Coverage of this schema: `back/test/integration/map-gather.test.ts` (map bounds 409, in-place/ranged gather → `resources`, deep-water 409, zone privacy), `back/test/integration/api.test.ts` (spawn + `chk_char_limit` same-race 400), and the guild/combat suites (positions churn). Run them with a fresh Postgres (`make test-int` after `dev-up`, or `stack up`).
+- No unit test in this repo; the CI `test` job runs `npm test` (a syntax check of the SQL files).
+- The real integration proof is the back's `test/integration/map-gather.test.ts` (run with `stack exec backend`): it exercises `positions`, `characters.resources` and the safe zone end-to-end; a fresh `stack up` applies the `08_world.sql` migration on the new DB (the `burn_until` column appears).
 
 ## Gotchas
-- **Fresh-volume-only init**: migrations run once on an empty `pgdata` volume; an existing volume is never migrated — schema changes need a reset (`dev-reset` / `stack down && stack up` deletes the volume).
-- `uq_cell` is a partial unique index (`WHERE item_id IS NULL`): dropped items can stack in one cell, entities cannot. Any new entity kind added to `positions` must respect the `num_nonnulls=1` check.
-- `maps` stores only dimensions: the map *content* (terrain/resources) is deterministic noise in back+front — changing thresholds in `terrain.ts` changes every map at once (mirror in `front/src/lib/terrain.js`, back card `map-terrain-gather`).
-- The seed coordinates are load-bearing: capitals are the spawn rings' centers (`spawn.freeCell`, r=4) and the 37-cell walkable ring of map 1 saturates in a long-lived dev DB (back `freeCell` now widens the radius rather than failing 503).
-- `resources` JSONB is unstructured: nothing stops a key other than the 5 resource names from appearing — always `jsonb_set` with the terrain resource, never free-text keys.
+- File order: `db/0*.sql` are applied **in lexicographic order** — `04_world.sql` (later `08_world.sql`) comes **after** `03_features.sql` and **before** the forum `07_*.sql` files: the forum permissions would otherwise see the **pre**-`04` schema. Renaming a migration is only safe on a fresh DB; on a shared dev DB the already-applied file keeps its old name.
+- Idempotency is a contract: every migration must be re-runnable (`IF NOT EXISTS`, guarded `DO $$` blocks).
+- `positions` is the single source of truth for "who is on which cell" — the back never recomputes it from `characters` alone; a stray `DELETE` would orphan entities (see the back card `map-terrain-gather`).
+- `08_world.sql` coordinates (portals, safe zone, Minotaure) are **copied** from the back's generated `humanMap.ts` `FEATURES` — keep them in sync when the map is re-generated.

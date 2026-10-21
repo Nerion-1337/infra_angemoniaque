@@ -18,7 +18,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 
 ## Features (2)
 - **docker-infrastructure** [done] (.kb/cards/docker-infrastructure.md) Docker orchestration: dev/prod stacks, Nginx proxy, Postgres migrations — Orchestrates the whole project on Docker: three compose targets (base, dev, prod) defining Postgres 16, Redis 7, the backend and frontend containers, an Nginx reverse proxy and ops tools (PgAdmin, Por — files: docker-compose.yml, docker-compose.dev.yml, docker-compose.prod.yml, nginx/nginx.conf (+12)
-- **world-schema** [done] (.kb/cards/world-schema.md) World schema: maps, positions (entity placement), character resources JSONB — The static world of the game in Postgres (`game_schema`): the three maps (dimensions only — the terrain itself is procedural, computed by `back/src/game/terrain.ts`, nothing per-cell is stored), the s — files: db/01_init.sql, db/02_extra.sql
+- **world-schema** [done] (.kb/cards/world-schema.md) World schema: maps, positions (entity placement), character resources JSONB — The PostgreSQL baseline: `db/01_init.sql` (schema + seed data) and `db/02_extra.sql` (extra columns/features), plus the feature migrations that follow it (guild order, ranks, forum, world v2). — files: db/01_init.sql, db/02_extra.sql, db/08_world.sql
 
 ## File map
 - `db/01_init.sql`
@@ -28,6 +28,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - `db/05_rank_order.sql`
 - `db/06_default_rank.sql`
 - `db/07_forum_perms.sql`
+- `db/08_world.sql`
 - `docker-compose.dev.yml` — DEV — projet "angemoniaque-dev" : conteneurs ange-dev-*, base/volumes/réseau séparés de la prod, ports différe
 - `docker-compose.prod.yml` — PROD — projet "angemoniaque-prod" : conteneurs ange-prod-*, volumes et réseau propres, images :prod
 - `docker-compose.yml` — Dépôt infra : orchestre TOUT (db, cache, back, front, proxy, outils). Les dépôts backend/ et frontend/ sont cl
