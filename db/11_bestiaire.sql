@@ -1,6 +1,6 @@
 SET search_path TO game_schema;
 -- Étape 2 — Phase 2 (Bestiaire) : drops de ressources dans monster_loot + probabilité des spawns.
--- Migrations appliquées uniquement sur volume vierge (convention du dépôt infra).
+-- Volume vierge : joué par l'entrypoint ; volume existant : rattrapé par scripts/migrate.sh.
 
 ALTER TABLE monster_loot ADD COLUMN resource TEXT;   -- drop de ressource (ex. 'bois', 'fer', 'ore_ether'…)
 ALTER TABLE monster_loot DROP CONSTRAINT monster_loot_check;

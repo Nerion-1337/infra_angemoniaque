@@ -9,6 +9,16 @@ services:
     ports: ["5433:5432"]
     volumes: [pgdata_dev:/var/lib/postgresql/data, ./db:/docker-entrypoint-initdb.d:ro]
     healthcheck: { test: ["CMD-SHELL","pg_isready -U $${POSTGRES_USER}"], interval: 5s, retries: 10 }
+  migrator:
+    # Rattrape les migrations db/*.sql manquantes sur un volume existant (l'initdb ne joue
+    # que sur volume vierge) ; sans effet sur un volume déjà migré (suivi schema_migrations).
+    container_name: ange-dev-migrator
+    image: postgres:16
+    env_file: .env
+    environment: { PGHOST: postgres }
+    volumes: ["./db:/db:ro", "./scripts:/scripts:ro"]
+    command: ["sh", "/scripts/migrate.sh"]
+    depends_on: { postgres: { condition: service_healthy } }
   redis:
     container_name: ange-dev-redis
     image: redis:7

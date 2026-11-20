@@ -13,3 +13,6 @@ psql-dev:   ; $(DEV) exec postgres sh -c 'psql -U $$POSTGRES_USER $$POSTGRES_DB'
 prod-up: init  ; $(PROD) up -d --build
 prod-down:  ; $(PROD) down
 prod-logs:  ; $(PROD) logs -f backend frontend
+# Rattrape les migrations manquantes sur le volume existant (service migrator idempotent).
+dev-migrate:  ; $(DEV) up -d migrator
+prod-migrate: ; $(PROD) up -d migrator
