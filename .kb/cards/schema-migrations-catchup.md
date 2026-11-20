@@ -9,6 +9,7 @@ files:
   - docker-compose.prod.yml
   - Makefile
   - db/11_bestiaire.sql
+  - db/12_monstre_details.sql
 symbols:
   - scripts/migrate.sh:marker
   - docker-compose.dev.yml:migrator
