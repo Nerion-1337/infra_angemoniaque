@@ -47,6 +47,7 @@ marker() {
     10_admin.sql)       echo "SELECT to_regclass('game_schema.races') IS NOT NULL";;
     11_bestiaire.sql)   echo "SELECT EXISTS (SELECT 1 FROM information_schema.columns c WHERE c.table_schema='game_schema' AND c.table_name='spawn_rules' AND c.column_name='active')";;
     12_monstre_details.sql) echo "SELECT to_regclass('game_schema.monster_spells') IS NOT NULL";;
+    13_monstre_capacites.sql) echo "SELECT to_regclass('game_schema.monster_auras') IS NULL";;
     *)                  echo "SELECT false";;  # nouveau fichier : pas de marqueur, appliqué s'il manque
   esac
 }

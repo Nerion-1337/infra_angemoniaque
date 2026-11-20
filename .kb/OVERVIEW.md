@@ -18,7 +18,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 
 ## Features (4)
 - **docker-infrastructure** [done] (.kb/cards/docker-infrastructure.md) Docker orchestration: dev/prod stacks, Nginx proxy, Postgres migrations — Orchestrates the whole project on Docker: three compose targets (base, dev, prod) defining Postgres 16, Redis 7, the backend and frontend containers, an Nginx reverse proxy and ops tools (PgAdmin, Por — files: docker-compose.yml, docker-compose.dev.yml, docker-compose.prod.yml, nginx/nginx.conf (+12)
-- **schema-migrations-catchup** [done] (.kb/cards/schema-migrations-catchup.md) Rattrapage des migrations sur volume existant (service migrator) — Sur un volume Postgres **déjà créé** (dev/prod), les migrations `db/*.sql` ne sont jamais appliquées par l'entrypoint Postgres (qui ne les joue que sur volume vierge). — files: scripts/migrate.sh, docker-compose.dev.yml, docker-compose.prod.yml, Makefile (+2)
+- **schema-migrations-catchup** [done] (.kb/cards/schema-migrations-catchup.md) Rattrapage des migrations sur volume existant (service migrator) — Sur un volume Postgres **déjà créé** (dev/prod), les migrations `db/*.sql` ne sont jamais appliquées par l'entrypoint Postgres (qui ne les joue que sur volume vierge). — files: scripts/migrate.sh, docker-compose.dev.yml, docker-compose.prod.yml, Makefile (+3)
 - **world-schema** [done] (.kb/cards/world-schema.md) World schema: maps, positions (entity placement), character resources JSONB — The PostgreSQL baseline: `db/01_init.sql` (schema + seed data) and `db/02_extra.sql` (extra columns/features), plus the feature migrations that follow it (guild order, ranks, forum, world v2). — files: db/01_init.sql, db/02_extra.sql, db/08_world.sql
 - **world2-angel-demon** [done] (.kb/cards/world2-angel-demon.md) Monde Anges & Démons : migration 09_world2.sql (carte 300x300) — Adapte la base au nouveau monde 2 : taille de la carte, capitales, portes, arrivées des portails humains, gardiens divins. — files: db/09_world2.sql
 
@@ -35,6 +35,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - `db/10_admin.sql`
 - `db/11_bestiaire.sql`
 - `db/12_monstre_details.sql`
+- `db/13_monstre_capacites.sql`
 - `docker-compose.dev.yml` — DEV — projet "angemoniaque-dev" : conteneurs ange-dev-*, base/volumes/réseau séparés de la prod, ports différe
 - `docker-compose.prod.yml` — PROD — projet "angemoniaque-prod" : conteneurs ange-prod-*, volumes et réseau propres, images :prod
 - `docker-compose.yml` — Dépôt infra : orchestre TOUT (db, cache, back, front, proxy, outils). Les dépôts backend/ et frontend/ sont cl
