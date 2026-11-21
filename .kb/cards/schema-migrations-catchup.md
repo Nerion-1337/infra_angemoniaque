@@ -2,7 +2,7 @@
 title: Rattrapage des migrations sur volume existant (service migrator)
 slug: schema-migrations-catchup
 status: done
-updated: 2026-11-20
+updated: 2026-11-21
 files:
   - scripts/migrate.sh
   - docker-compose.dev.yml
@@ -64,6 +64,12 @@ volume partiellement migré.
      on relance le migrator → il n'applique que les fichiers manquants et complète la base.
   3. On vérifie que les artefacts nouveaux (`accounts.role`, tables bestiaire) existent.
 - Vérifie que le volume n'est pas altéré (pas de rejeu en double, pas d'effacement de données).
+
+- **Marqueurs par fichier** (dans `migrate.sh`) : 10 → `accounts.role`, 11 →
+  `monster_loot`, 12 → `monster_spells`, 13 → disparition de `monster_auras`,
+  14 → colonne `spells.usable_by` (la présence d'une seule table/colonne suffit à
+  baseliner le fichier ; un fichier **partiellement** appliqué d'avant le suivi reste un
+  cas à traiter à la main, voir l'incident volume dev 2026-11).
 
 ## Gotchas
 - **Ordre lexicographique obligatoire** : les fichiers s'appliquent dans l'ordre `db/*.sql` ;

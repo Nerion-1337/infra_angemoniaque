@@ -2,7 +2,7 @@
 title: World schema: maps, positions (entity placement), character resources JSONB
 slug: world-schema
 status: done
-updated: 2026-10-21
+updated: 2026-11-21
 files:
   - db/01_init.sql
   - db/02_extra.sql
@@ -34,6 +34,11 @@ Reads: the back `db` pool (single source of truth for characters, positions, bui
 ## Tests
 - No unit test in this repo; the CI `test` job runs `npm test` (a syntax check of the SQL files).
 - The real integration proof is the back's `test/integration/map-gather.test.ts` (run with `stack exec backend`): it exercises `positions`, `characters.resources` and the safe zone end-to-end; a fresh `stack up` applies the `08_world.sql` migration on the new DB (the `burn_until` column appears).
+
+- **Migration 14 (phase 4, rareté & acquisition)** : `items.usable_by` (jsonb, 6 kinds —
+  qui peut s'en équiper) ; `spells.rarity` (CHECK 5 valeurs) + `spells.usable_by` (jsonb —
+  qui peut l'apprendre). `items.rarity` reste du texte libre (données historiques « Épique »,
+  « unique »…) : la normalisation se fait côté API admin (`rarity_n`), pas par contrainte.
 
 ## Gotchas
 - File order: `db/0*.sql` are applied **in lexicographic order** — `04_world.sql` (later `08_world.sql`) comes **after** `03_features.sql` and **before** the forum `07_*.sql` files: the forum permissions would otherwise see the **pre**-`04` schema. Renaming a migration is only safe on a fresh DB; on a shared dev DB the already-applied file keeps its old name.
