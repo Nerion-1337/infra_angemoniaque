@@ -2,7 +2,7 @@
 title: Rattrapage des migrations sur volume existant (service migrator)
 slug: schema-migrations-catchup
 status: done
-updated: 2026-11-21
+updated: 2026-11-23
 files:
   - scripts/migrate.sh
   - docker-compose.dev.yml
@@ -72,6 +72,7 @@ volume partiellement migré.
   cas à traiter à la main, voir l'incident volume dev 2026-11).
 
 ## Gotchas
+- **Copies Windows (CRLF)** : le migrator lance `sed 's/\r$$//' /scripts/migrate.sh > /tmp/migrate.sh && exec sh /tmp/migrate.sh` (le `$$` est l'échappement compose de `$`). Sans cela, un `migrate.sh` en CRLF échoue dès `set -e` (« set: Illegal option - »). `.gitattributes` (eol=lf) ne réécrit pas les fichiers déjà extraits : ré-extraire après l'avoir récupéré. Testé le 2026-11-24 avec script + 15 SQL en CRLF (psql accepte les SQL en CRLF).
 - **Ordre lexicographique obligatoire** : les fichiers s'appliquent dans l'ordre `db/*.sql` ;
   un `12_*.sql` vient après `11_*.sql`. Ne jamais renommer un fichier déjà appliqué.
 - **Marqueur = artefact distinctif et idempotent** : ajouter un nouveau fichier `NN_*.sql`

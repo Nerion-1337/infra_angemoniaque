@@ -17,7 +17,8 @@ services:
     env_file: .env
     environment: { PGHOST: postgres }
     volumes: ["./db:/db:ro", "./scripts:/scripts:ro"]
-    command: ["sh", "/scripts/migrate.sh"]
+    # sed retire les CR : une copie Windows (CRLF) ferait échouer sh dès « set -e »
+    command: ["sh", "-c", "sed 's/\\r$$//' /scripts/migrate.sh > /tmp/migrate.sh && exec sh /tmp/migrate.sh"]
     depends_on: { postgres: { condition: service_healthy } }
   redis:
     container_name: ange-dev-redis

@@ -2,7 +2,7 @@
 title: Docker orchestration: dev/prod stacks, Nginx proxy, Postgres migrations
 slug: docker-infrastructure
 status: done
-updated: 2026-10-20
+updated: 2026-11-23
 files:
   - docker-compose.yml
   - docker-compose.dev.yml
@@ -69,6 +69,7 @@ Orchestrates the whole project on Docker: three compose targets (base, dev, prod
 - Nginx syntax: `nginx -t` against `nginx/nginx.conf` (CI step).
 
 ## Gotchas
+- **Copies Windows (CRLF)** : le migrator lance `sed 's/\r$$//' /scripts/migrate.sh > /tmp/migrate.sh && exec sh /tmp/migrate.sh` (le `$$` est l'échappement compose de `$`). Sans cela, un `migrate.sh` en CRLF échoue dès `set -e` (« set: Illegal option - »). `.gitattributes` (eol=lf) ne réécrit pas les fichiers déjà extraits : ré-extraire après l'avoir récupéré. Testé le 2026-11-24 avec script + 15 SQL en CRLF (psql accepte les SQL en CRLF).
 - Migrations on a **fresh** volume run only at first start (entrypoint `initdb`); on an **existing** volume they are caught up by the `migrator` service (`make dev-up` / `prod-up`, or `make dev-migrate` / `prod-migrate`) — see card `schema-migrations-catchup`. So a new `db/*.sql` file does NOT require `dev-reset`; the migrator applies it to the running volume.
 - `db/*.sql` must stay in lexicographic order; `02_extra.sql`, `03_features.sql`, `04_guild_order.sql`, `05_rank_order.sql` and `06_default_rank.sql` ALTER tables created by `01_init.sql` — renumbering or reordering breaks a fresh init.
 - `BACKEND_PATH` / `FRONTEND_PATH` (default `../backend`, `../frontend`) assume the repos are checked out side-by-side; relocate and export the variables.
