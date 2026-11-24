@@ -16,7 +16,8 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - tests SQL (psql requis) : `scripts/check-sql.sh` ; backup : `scripts/backup-db.sh [dev|prod]`
 - kb : backend d'embedding `hash` (offline) dans `.kb/config.json`
 
-## Features (5)
+## Features (6)
+- **divine-families-schema** [done] (.kb/cards/divine-families-schema.md) Familles divines (migration 16) : divine_families, items.divine_family, divine_items.item_id — Permet de gérer les objets divins comme les autres objets (une ligne `items` de rareté « divin ») et de créer d'autres familles que relique / arcane / artefact, chacune avec son plafond global d'exemp — files: db/16_familles_divines.sql
 - **docker-infrastructure** [done] (.kb/cards/docker-infrastructure.md) Docker orchestration: dev/prod stacks, Nginx proxy, Postgres migrations — Orchestrates the whole project on Docker: three compose targets (base, dev, prod) defining Postgres 16, Redis 7, the backend and frontend containers, an Nginx reverse proxy and ops tools (PgAdmin, Por — files: docker-compose.yml, docker-compose.dev.yml, docker-compose.prod.yml, nginx/nginx.conf (+12)
 - **schema-migrations-catchup** [done] (.kb/cards/schema-migrations-catchup.md) Rattrapage des migrations sur volume existant (service migrator) — Sur un volume Postgres **déjà créé** (dev/prod), les migrations `db/*.sql` ne sont jamais appliquées par l'entrypoint Postgres (qui ne les joue que sur volume vierge). — files: scripts/migrate.sh, docker-compose.dev.yml, docker-compose.prod.yml, Makefile (+3)
 - **tile-types-schema** [done] (.kb/cards/tile-types-schema.md) Table tile_types (migration 15) : types de case par monde — Table `game_schema.tile_types` : un type de case par (monde, kind) avec nom, description, coût d'énergie et sort passif optionnel, éditée par la section admin « Cases » (cards `back/tile-types`, `fron — files: db/15_types_de_case.sql
@@ -39,6 +40,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - `db/13_monstre_capacites.sql`
 - `db/14_rarete_acquisition.sql`
 - `db/15_types_de_case.sql`
+- `db/16_familles_divines.sql`
 - `docker-compose.dev.yml` — DEV — projet "angemoniaque-dev" : conteneurs ange-dev-*, base/volumes/réseau séparés de la prod, ports différe
 - `docker-compose.prod.yml` — PROD — projet "angemoniaque-prod" : conteneurs ange-prod-*, volumes et réseau propres, images :prod
 - `docker-compose.yml` — Dépôt infra : orchestre TOUT (db, cache, back, front, proxy, outils). Les dépôts backend/ et frontend/ sont cl
