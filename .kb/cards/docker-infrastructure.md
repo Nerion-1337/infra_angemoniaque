@@ -2,7 +2,7 @@
 title: Docker orchestration: dev/prod stacks, Nginx proxy, Postgres migrations
 slug: docker-infrastructure
 status: done
-updated: 2026-11-23
+updated: 2026-11-24
 files:
   - docker-compose.yml
   - docker-compose.dev.yml
@@ -39,42 +39,24 @@ tests:
   - scripts/check-sql.sh
 ---
 ## Purpose
-Orchestrates the whole project on Docker: three compose targets (base, dev, prod) defining Postgres 16, Redis 7, the backend and frontend containers, an Nginx reverse proxy and ops tools (PgAdmin, Portainer in prod). It also owns the ordered SQL migrations that build the `game_schema` schema consumed by the backend, plus ops scripts (SQL validation, database backup).
+Orchestration Docker du projet : environnements dev et prod indépendants (Postgres 16, Redis 7, backend, frontend, Nginx, outils),
+migrations SQL ordonnées du schéma `game_schema`, scripts d'exploitation et Makefile.
 
-## How it works
-- `.env` (created from `.env.example` by `make init`) provides POSTGRES_USER/POSTGRES_PASSWORD/POSTGRES_DB, JWT_SECRET and PgAdmin credentials. All three compose files use `env_file: .env`.
-- `docker-compose.yml` (base) declares the service graph: postgres (healthcheck `pg_isready`, data in volume `pgdata`, migrations mounted read-only at `/docker-entrypoint-initdb.d`), redis (healthcheck `redis-cli ping`), backend (built from `${BACKEND_PATH:-../backend}`, gets `DATABASE_URL`/`REDIS_URL`, waits for healthy postgres+redis), frontend (built from `${FRONTEND_PATH:-../frontend}`) and nginx:1.27 on port 80.
-- `docker-compose.dev.yml` overlays project `angemoniaque-dev` (containers `ange-dev-*`): separate volumes `pgdata_dev` + named `*_modules_dev` volumes for node_modules, exposed ports 8080 (game) / 5433 (postgres) / 5051 (PgAdmin); sources are bind-mounted and node_modules stay in named volumes so the host never sees dependencies; backend runs the Dockerfile `dev` target (`npm run dev`, hot reload with `CHOKIDAR_USEPOLLING`), frontend the Vite dev server on 5173.
-- `docker-compose.prod.yml` overlays project `angemoniaque-prod` (containers `ange-prod-*`): single `pgdata` volume, `:prod` image targets, nginx serves the static frontend build and proxies the API on port 80, plus PgAdmin (:5050) and Portainer (:9000).
-- `nginx/nginx.conf` (prod): `/api/` → `http://backend:3000/` (prefix stripped) with WebSocket upgrade headers; `/` → `http://frontend:80` (static dist). `nginx/nginx.dev.conf` is identical except `/` → `http://frontend:5173` (Vite HMR).
-- Migrations run in lexicographic order: on a **fresh** volume the Postgres entrypoint plays `db/*.sql` at first start; on an **existing** volume the `migrator` service (card `schema-migrations-catchup`) catches up the missing files via `scripts/migrate.sh` (tracked in `game_schema.schema_migrations`). `01_init.sql` creates `game_schema` (maps, specializations, stat_cost_rules, characters, …), `02_extra.sql` adds accounts/guilds/guild forum and item/mount columns, `03_features.sql` adds summons, controlled summons and spells, `04_guild_order.sql` adds `sort_order` to the guild forum tables (category/topic reordering, back `POST /guilds/reorder`), `05_rank_order.sql` adds `sort_order` to `guild_ranks` (rank-card reordering in the manage tab, back `POST /guilds/reorder` with `kind: 'ranks'`), `06_default_rank.sql` adds `default_rank_id` to `guilds` (default rank for newcomers, back `POST /guilds/default-rank`), `07_forum_perms.sql` adds `description` + `write_ranks` to `guild_folders`/`guild_topics` and the `guild_topic_reads` table (granular read/write forum perms + unread tracking, back card `guild-forum-perms`).
-- `scripts/check-sql.sh` re-applies `db/*.sql` in order on a fresh database with `ON_ERROR_STOP=1` and smoke-selects `game_schema.specializations`; `scripts/backup-db.sh [dev|prod]` pg_dumps the running postgres container to a timestamped SQL file.
-- `Makefile` is the single entry point: `dev-up/dev-down/dev-reset/dev-logs/dev-deps`, `dev-migrate/prod-migrate` (re-run the catch-up migrator), `test-back/test-front` (build the Dockerfile `test` target), `test-int` (integration tests inside the dev stack), `prod-up/prod-down/prod-logs`.
-
-## Entry points
-- `make dev-up` / `make prod-up` (Makefile) — the only intended ways to start either stack
-- `.github/workflows/ci.yml` — validates both compose files (`config -q`), runs `check-sql.sh` against a postgres service, and `nginx -t` on `nginx/nginx.conf`
-- `.github/workflows/cd.yml` — deploys on `v*` tags (git pull + compose up on the host)
-- `front/Dockerfile` + `back/Dockerfile` — build contexts referenced by the compose files (`build: context: ${BACKEND_PATH:-../backend}`)
-
-## Data flow
-- Browser → Nginx :80 (prod) / :8080 (dev): `/` → frontend (static in prod, Vite:5173 in dev); `/api/...` → backend:3000 with the `/api` prefix stripped and WS upgrade headers forwarded
-- backend → Postgres via `DATABASE_URL` (connection string built by compose; pool options force `search_path=game_schema`)
-- backend → Redis via `REDIS_URL` for realtime pub/sub (`map:{id}` channels, see `back` repo `realtime/ws.ts`)
-- Persistence: `pgdata` / `pgdata_dev` volumes for Postgres; `portainer` volume; node_modules live in `backend_modules_dev` / `frontend_modules_dev` (dev only, never on the host)
-
-## Tests
-- `scripts/check-sql.sh` — applies all migrations to a pristine database (fresh `angemoniaque` DB via psql, `ON_ERROR_STOP=1`) and checks the `specializations` table exists; run in CI with a postgres service and locally when psql is available. Also registered via `kb init --test-cmd` for the local (docker-less) validation used by `kb finish`.
-- Compose syntax: `docker compose -f docker-compose.dev.yml config -q` and same for prod (CI step).
-- Nginx syntax: `nginx -t` against `nginx/nginx.conf` (CI step).
+## Business rules
+- Dev (`angemoniaque-dev`, conteneurs `ange-dev-*`) et prod (`angemoniaque-prod`) tournent en parallèle : projets, ports et volumes distincts (dev : 8080 jeu, 5433 Postgres, 5051 PgAdmin ; prod : 80, 5050 PgAdmin, 9000 Portainer).
+- Nginx : `/api/` → backend:3000 avec le préfixe RETIRÉ et l'en-tête WebSocket ; `/` → frontend (fichiers statiques en prod, Vite HMR en dev).
+- `node_modules` uniquement dans des volumes nommés : l'hôte ne voit jamais les dépendances.
+- Migrations `db/*.sql` en ordre lexicographique : jouées par l'entrypoint Postgres sur volume NEUF, rattrapées par le service `migrator` sur volume existant (un nouveau fichier n'exige pas de `dev-reset`).
+- Secrets (`JWT_SECRET`, identifiants Postgres et PgAdmin) dans `.env` (hors Git) ; `.env.example` = valeurs de dev ; la prod doit en avoir d'autres.
+- Ce dépôt ne modifie jamais `../front` ni `../back` : un besoin côté application est signalé, pas codé ici.
+- Le Makefile est le point d'entrée unique (`dev-up`, `prod-up`, `dev-migrate`, `test-*`…).
 
 ## Gotchas
-- **Copies Windows (CRLF)** : le migrator lance `sed 's/\r$$//' /scripts/migrate.sh > /tmp/migrate.sh && exec sh /tmp/migrate.sh` (le `$$` est l'échappement compose de `$`). Sans cela, un `migrate.sh` en CRLF échoue dès `set -e` (« set: Illegal option - »). `.gitattributes` (eol=lf) ne réécrit pas les fichiers déjà extraits : ré-extraire après l'avoir récupéré. Testé le 2026-11-24 avec script + 15 SQL en CRLF (psql accepte les SQL en CRLF).
-- Migrations on a **fresh** volume run only at first start (entrypoint `initdb`); on an **existing** volume they are caught up by the `migrator` service (`make dev-up` / `prod-up`, or `make dev-migrate` / `prod-migrate`) — see card `schema-migrations-catchup`. So a new `db/*.sql` file does NOT require `dev-reset`; the migrator applies it to the running volume.
-- `db/*.sql` must stay in lexicographic order; `02_extra.sql`, `03_features.sql`, `04_guild_order.sql`, `05_rank_order.sql` and `06_default_rank.sql` ALTER tables created by `01_init.sql` — renumbering or reordering breaks a fresh init.
-- `BACKEND_PATH` / `FRONTEND_PATH` (default `../backend`, `../frontend`) assume the repos are checked out side-by-side; relocate and export the variables.
-- Dev and prod run in parallel by design (separate compose projects, ports and volumes) — do not reuse dev ports in prod or vice versa.
-- Absolute rule: this repo must never modify `../front` or `../back`; if an app-side change is needed to adapt to the infra, document it and report it instead.
-- `JWT_SECRET`, `PGADMIN_*` and Postgres credentials come from `.env` (gitignored secret); `.env.example` holds the dev defaults (`ange`/`change-me`) — prod credentials must differ.
-- Nginx here terminates plaintext HTTP; SSL/TLS termination in production is an operator-level concern (documented in AGENTS.md).
-- `portainer` mounts `/var/run/docker.sock` — prod-only, do not add it to dev.
+- Copies Windows (CRLF) : le migrator retire les `\r` (`sed 's/\r$$//'`, `$$` = échappement compose) avant d'exécuter `migrate.sh` ; `.gitattributes` (eol=lf) ne réécrit pas les fichiers déjà extraits.
+- Renuméroter ou réordonner les migrations casse une initialisation neuve.
+- `BACKEND_PATH` / `FRONTEND_PATH` supposent les dépôts côte à côte.
+- Portainer monte le socket Docker : prod seulement.
+- Pas de TLS ici (affaire d'exploitation).
+
+## Tests
+`scripts/check-sql.sh` (toutes les migrations sur une base vierge, `ON_ERROR_STOP`) ; CI : `config -q` des fichiers compose, `nginx -t` ; test local `kb` : syntaxe des scripts + YAML.

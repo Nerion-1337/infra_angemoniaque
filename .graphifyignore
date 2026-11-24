@@ -1,0 +1,9 @@
+# Carte graphify (.kb/graph) : code et scripts seulement, jamais les secrets (.env), sauvegardes ni volumes.
+graphify-out/
+.kb/
+.env
+.env.*
+backups/
+data/
+*.sql.gz
+*.dump
