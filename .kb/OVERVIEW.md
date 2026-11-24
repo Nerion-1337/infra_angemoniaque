@@ -16,10 +16,11 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - tests SQL (psql requis) : `scripts/check-sql.sh` ; backup : `scripts/backup-db.sh [dev|prod]`
 - kb : backend d'embedding `hash` (offline) dans `.kb/config.json`
 
-## Features (7)
+## Features (8)
 - **divine-families-schema** [done] (.kb/cards/divine-families-schema.md) Familles divines (migration 16) : divine_families, items.divine_family, divine_items.item_id — Migration 16 : objets divins gérés comme les autres objets (ligne `items` de rareté divin) et familles libres au-delà de relique / arcane / artefact, chacune avec un plafond d'exemplaires. — files: db/16_familles_divines.sql
 - **docker-infrastructure** [done] (.kb/cards/docker-infrastructure.md) Docker orchestration: dev/prod stacks, Nginx proxy, Postgres migrations — Orchestration Docker du projet : environnements dev et prod indépendants (Postgres 16, Redis 7, backend, frontend, Nginx, outils), migrations SQL ordonnées du schéma `game_schema`, scripts d'exploitat — files: docker-compose.yml, docker-compose.dev.yml, docker-compose.prod.yml, nginx/nginx.conf (+12)
 - **races-clock-schema** [done] (.kb/cards/races-clock-schema.md) Migrations 17-18 : apparition, limites et équipement de départ par race, horloge du monde, trigger de création aligné — Migrations 17 et 18 : réglages des races (zone d'apparition, limites, équipement de départ), horloge du monde persistante, et trigger de création de personnage aligné sur ces réglages avec exemption d — files: db/17_races_apparition_horloge.sql, db/18_depart_par_race.sql
+- **recipes-shop-schema** [done] (.kb/cards/recipes-shop-schema.md) Migration 19 : boutique par race et recettes de parchemins — Migration 19 : boutique de l'hôtel de ville par race (objets, sorts) et table des recettes de parchemins. — files: db/19_boutique_parchemins.sql
 - **schema-migrations-catchup** [done] (.kb/cards/schema-migrations-catchup.md) Rattrapage des migrations sur volume existant (service migrator) — Rattrapage des migrations sur un volume Postgres déjà créé (dev/prod) : le service `migrator` applique les fichiers `db/*.sql` manquants à chaque `make dev-up` / `prod-up`, sans casser un volume parti — files: scripts/migrate.sh, docker-compose.dev.yml, docker-compose.prod.yml, Makefile (+3)
 - **tile-types-schema** [done] (.kb/cards/tile-types-schema.md) Table tile_types (migration 15) : types de case par monde — Table `tile_types` (migration 15) : un type de case par (monde, kind) avec nom, description, coût d'énergie et sort passif, éditée par la section admin « Cases ». — files: db/15_types_de_case.sql
 - **world-schema** [done] (.kb/cards/world-schema.md) World schema: maps, positions (entity placement), character resources JSONB — Socle du schéma PostgreSQL (`01_init.sql`, `02_extra.sql`) et migrations de fonctionnalités qui suivent (guildes, forum, monde v2, admin, bestiaire, rareté…), lus par le back ; leur ordre fait partie  — files: db/01_init.sql, db/02_extra.sql, db/08_world.sql
@@ -44,27 +45,10 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - `db/16_familles_divines.sql`
 - `db/17_races_apparition_horloge.sql`
 - `db/18_depart_par_race.sql`
+- `db/19_boutique_parchemins.sql`
 - `docker-compose.dev.yml` — DEV — projet "angemoniaque-dev" : conteneurs ange-dev-*, base/volumes/réseau séparés de la prod, ports différe
 - `docker-compose.prod.yml` — PROD — projet "angemoniaque-prod" : conteneurs ange-prod-*, volumes et réseau propres, images :prod
 - `docker-compose.yml` — Dépôt infra : orchestre TOUT (db, cache, back, front, proxy, outils). Les dépôts backend/ et frontend/ sont cl
-- `graphify-out/.graphify_build_state.json`
-- `graphify-out/.graphify_labels.json`
-- `graphify-out/.graphify_labels.pending.json`
-- `graphify-out/.graphify_partition_cache.json`
-- `graphify-out/cache/ast/v0.9.118-s53-gd93bdf18e146/5dce5482ecff5202774a166a4342c282ebca56e6c504f110f84edd3b98383e62.json`
-- `graphify-out/cache/ast/v0.9.118-s53-gd93bdf18e146/7038b21dae983170b463a753fd932abe08c169c24af86d8311b753f160878a0b.json`
-- `graphify-out/cache/ast/v0.9.118-s53-gd93bdf18e146/8361eda8eac30f19124a29595ce4f2443ce277bd3167948c954f9c4263407a8d.json`
-- `graphify-out/cache/ast/v0.9.118-s53-gd93bdf18e146/88830e5f0c45e1f85514d54cb4e542cb27741337c6a95f791f278d7c12670ac1.json`
-- `graphify-out/cache/ast/v0.9.118-s53-gd93bdf18e146/8bf4fb0629843d1e5e009d6d8e9e35924d5a3fecbac337f8c1ef0b5057634226.json`
-- `graphify-out/cache/ast/v0.9.118-s53-gd93bdf18e146/94b0baaae158df7955f39babcd0d216dc9d2e6786d93f1ae88e8512403d7a16d.json`
-- `graphify-out/cache/ast/v0.9.118-s53-gd93bdf18e146/9c3a8c52a77e3dac5ebb22e4332d9743bd0e1a1db795f4b490947f557c229b50.json`
-- `graphify-out/cache/ast/v0.9.118-s53-gd93bdf18e146/a8c560e8a86e05c6701a5fb867e826295d258c841c9e3a5f02433c4fd52aa313.json`
-- `graphify-out/cache/ast/v0.9.118-s53-gd93bdf18e146/d04991803c26e96ba7d91b35120062db1f9e7bc1abe0267853047aaa364845d0.json`
-- `graphify-out/cache/ast/v0.9.118-s53-gd93bdf18e146/f0c0e72fcb5b4a3ceb3f349dfe717f7c2951dd5bd86f0c866982860599738a94.json`
-- `graphify-out/cache/stat-index.json`
-- `graphify-out/graph.html` — { box-sizing: border-box; margin: 0; padding: 0; }
-- `graphify-out/graph.json`
-- `graphify-out/manifest.json`
 - `scripts/backup-db.sh` — Sauvegarde SQL (reprise du dépôt d'origine). Usage : ./backup-db.sh [dev|prod]
 - `scripts/check-sql.sh` — Applique les scripts SQL dans l'ordre sur une base vierge (CI + pre-commit si psql dispo).
 - `scripts/migrate.sh` — Migration catch-up : applique les infra/db/*.sql manquants (ordre lexicographique),
