@@ -4,6 +4,7 @@ slug: item-stats-schema
 status: done
 updated: 2026-11-25
 files:
+  - db/37_puissance_distance.sql
   - db/36_portee_armes.sql
   - db/26_objets_caracteristiques.sql
   - db/32_equipement_carte.sql
@@ -25,6 +26,7 @@ d'armure magique pour l'occupant d'un bâtiment.
 - Migration 32 : `items.two_handed` (arcs et `data.hands = 2` repris) ; types « bow / mains / tete / torse / pieds / collier / bague » ramenés à weapon / head / chest / foot / amulet / ring ; un arc équipé passe en main principale si les deux mains sont libres, sinon au sac ; `characters.map_upgrade` ; `game_config.map_upgrade_price` = 500. Idempotente.
 - Migration 34 : `monsters.size` (1 à 3, défaut 1).
 - Migration 36 : `items.reach` (1 à 20, défaut 1) et `items.full_power_at` (NULL ou 1 ≤ N < reach, CHECK `chk_item_reach`).
+- Migration 37 : `items.power_start` (défaut 100) et `power_end` (défaut 50, ancien comportement repris), 0 à 100 ; `full_power_at` peut valoir la portée (CHECK `chk_item_reach` refait).
 
 ## Gotchas
 - Le retrait utilise `applied`, jamais les bonus actuels de l'objet (l'admin peut les avoir changés entre-temps).
