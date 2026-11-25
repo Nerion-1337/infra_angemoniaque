@@ -1,11 +1,12 @@
 ---
-title: Migrations 23 et 30 : secteurs de ressources et leurs ressources
+title: Migrations 23, 30, 31 : secteurs de ressources, leurs ressources, conditions de récolte
 slug: deposits-schema
 status: done
 updated: 2026-11-25
 files:
   - db/23_gisements.sql
   - db/30_secteurs_ressources.sql
+  - db/31_conditions_recolte.sql
 symbols:
   - 
 tests:
@@ -20,6 +21,7 @@ Migrations 23 et 30 : secteurs de ressources (zone d'un monde) et leurs ressourc
 - Migration 30 : chaque ancien gisement devient un secteur à une ressource (100 %, toute case) ; les anciennes colonnes de stock sont supprimées ensuite.
 - Somme des parts ≤ 100 % par type de case : vérifiée par l'API, pas par la base.
 - Idempotentes (reprise gardée par la présence de l'ancienne colonne `resource`).
+- Migration 31 : `resource_rules(resource PK, harvest JSONB {groups})` — conditions de récolte par ressource du catalogue (format des conditions d'activation des bâtiments) ; sans ligne = récolte libre.
 
 ## Gotchas
 - La ressource n'a pas de clé étrangère (catalogue en code) : vérifiée par l'API.
