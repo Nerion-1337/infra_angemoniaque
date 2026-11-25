@@ -55,7 +55,7 @@ marker() {
 
 for f in "$MIGRATIONS"/*.sql; do
   n=$(basename "$f")
-  case "$n" in 0*.sql|1*.sql) ;; *) continue ;; esac
+  case "$n" in [0-9][0-9]_*.sql) ;; *) continue ;; esac   # tous les NN_*.sql (avant : 0*|1* seulement, 20+ ignorés)
   if [ "$(PSQL -tAc "SELECT count(*) FROM game_schema.schema_migrations WHERE name='$n'")" = "1" ]; then
     echo "ok (applied) $n"
     continue

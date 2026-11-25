@@ -2,7 +2,7 @@
 title: Rattrapage des migrations sur volume existant (service migrator)
 slug: schema-migrations-catchup
 status: done
-updated: 2026-11-24
+updated: 2026-11-25
 files:
   - scripts/migrate.sh
   - docker-compose.dev.yml
@@ -24,7 +24,7 @@ Rattrapage des migrations sur un volume Postgres déjà créé (dev/prod) : le s
 manquants à chaque `make dev-up` / `prod-up`, sans casser un volume partiellement migré.
 
 ## Business rules
-- Fichiers traités en ordre lexicographique ; chaque fichier appliqué est enregistré dans `game_schema.schema_migrations`.
+- Tous les fichiers `NN_*.sql` (deux chiffres) sont traités, en ordre lexicographique ; chaque fichier appliqué est enregistré dans `game_schema.schema_migrations`.
 - Déjà enregistré → sauté ; marqueur présent (artefact distinctif du fichier) → enregistré SANS rejeu (« baseline ») ; sinon appliqué avec `ON_ERROR_STOP` puis enregistré.
 - Un fichier sans marqueur (nouveau) est appliqué s'il manque ; il doit donc être idempotent ou ne jamais avoir existé sur un volume historique.
 - Le migrator n'efface jamais de données ; sur volume neuf il ne fait qu'enregistrer.
@@ -35,7 +35,7 @@ manquants à chaque `make dev-up` / `prod-up`, sans casser un volume partielleme
 - Un fichier qui échoue à moitié n'est pas enregistré : le terminer à la main puis `INSERT INTO schema_migrations(name)`.
 - Le marqueur d'un fichier doit être un artefact qu'IL crée (pas un artefact partagé).
 - Copies Windows (CRLF) : voir `docker-infrastructure` (le migrator retire les `\r`).
-- L'entrypoint `initdb` et le migrator doivent rester d'accord sur l'ensemble des fichiers.
+- L'entrypoint `initdb` et le migrator doivent rester d'accord sur l'ensemble des fichiers. Bug corrigé le 2026-11-25 : le filtre ne gardait que `0*`/`1*`, les migrations 20+ étaient ignorées sans erreur (« Migrations : OK » après 19).
 
 ## Tests
-Syntaxe (`bash -n scripts/migrate.sh` + YAML) ; vérifié sur la stack (baseline sur volume neuf, volume partiel complété) ; test réel 2026-11-24 avec script et SQL en CRLF.
+Syntaxe (`bash -n scripts/migrate.sh` + YAML) ; vérifié sur la stack (baseline sur volume neuf, volume partiel complété) ; test réel 2026-11-24 avec script et SQL en CRLF ; 2026-11-25 : Postgres jetable migré jusqu'à 19 → 20 à 23 appliquées, 2e passage sans effet.
