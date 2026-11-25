@@ -5,6 +5,7 @@ status: done
 updated: 2026-11-25
 files:
   - db/26_objets_caracteristiques.sql
+  - db/32_equipement_carte.sql
 symbols:
   - 
 tests:
@@ -19,6 +20,7 @@ d'armure magique pour l'occupant d'un bâtiment.
 - Trigger `trg_item_bonus` (BEFORE INSERT, UPDATE OF equipped_slot, DELETE sur `character_items`) : équipé → `applied` = bonus de l'objet, ajoutés à la fiche ; déséquipé ou ligne portée supprimée → `applied` retiré.
 - `apply_item_bonus` : PV max ≥ 1, autres ≥ 0 ; réserves (PV, énergie, énergie divine) ramenées sous leur max.
 - Idempotente.
+- Migration 32 : `items.two_handed` (arcs et `data.hands = 2` repris) ; types « bow / mains / tete / torse / pieds / collier / bague » ramenés à weapon / head / chest / foot / amulet / ring ; un arc équipé passe en main principale si les deux mains sont libres, sinon au sac ; `characters.map_upgrade` ; `game_config.map_upgrade_price` = 500. Idempotente.
 
 ## Gotchas
 - Le retrait utilise `applied`, jamais les bonus actuels de l'objet (l'admin peut les avoir changés entre-temps).
