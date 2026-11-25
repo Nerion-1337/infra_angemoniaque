@@ -7,6 +7,7 @@ files:
   - db/23_gisements.sql
   - db/30_secteurs_ressources.sql
   - db/31_conditions_recolte.sql
+  - db/33_sac_ressources.sql
 symbols:
   - 
 tests:
@@ -22,6 +23,7 @@ Migrations 23 et 30 : secteurs de ressources (zone d'un monde) et leurs ressourc
 - Somme des parts ≤ 100 % par type de case : vérifiée par l'API, pas par la base.
 - Idempotentes (reprise gardée par la présence de l'ancienne colonne `resource`).
 - Migration 31 : `resource_rules(resource PK, harvest JSONB {groups})` — conditions de récolte par ressource du catalogue (format des conditions d'activation des bâtiments) ; sans ligne = récolte libre.
+- Migration 33 : `resource_rules.stack_max` (défaut 20, 1–100000) ; `characters.bag_size` (20) ; `characters.chest_resources` (JSONB, ressources du coffre).
 
 ## Gotchas
 - La ressource n'a pas de clé étrangère (catalogue en code) : vérifiée par l'API.
