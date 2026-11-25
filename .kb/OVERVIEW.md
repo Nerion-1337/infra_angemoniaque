@@ -16,11 +16,12 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - tests SQL (psql requis) : `scripts/check-sql.sh` ; backup : `scripts/backup-db.sh [dev|prod]`
 - kb : backend d'embedding `hash` (offline) dans `.kb/config.json`
 
-## Features (12)
+## Features (13)
 - **buildings-schema** [done] (.kb/cards/buildings-schema.md) Migration 22 : bâtiments paramétrables et unicité des cases séparée — Migration 22 : colonnes des bâtiments paramétrables et séparation de l'unicité des cases (entités / bâtiments). — files: db/22_batiments.sql
 - **deposits-schema** [done] (.kb/cards/deposits-schema.md) Migration 23 : gisements de ressources — Migration 23 : table des gisements de ressources. — files: db/23_gisements.sql
 - **divine-families-schema** [done] (.kb/cards/divine-families-schema.md) Familles divines (migration 16) : divine_families, items.divine_family, divine_items.item_id — Migration 16 : objets divins gérés comme les autres objets (ligne `items` de rareté divin) et familles libres au-delà de relique / arcane / artefact, chacune avec un plafond d'exemplaires. — files: db/16_familles_divines.sql
 - **docker-infrastructure** [done] (.kb/cards/docker-infrastructure.md) Docker orchestration: dev/prod stacks, Nginx proxy, Postgres migrations — Orchestration Docker du projet : environnements dev et prod indépendants (Postgres 16, Redis 7, backend, frontend, Nginx, outils), migrations SQL ordonnées du schéma `game_schema`, scripts d'exploitat — files: docker-compose.yml, docker-compose.dev.yml, docker-compose.prod.yml, nginx/nginx.conf (+12)
+- **monster-mounts-schema** [done] (.kb/cards/monster-mounts-schema.md) Migration 25 : monstres servant de monture (projection mounts, trigger sync_mount) — Migration 25 : fusion monstres / montures. — files: db/25_monstres_montures.sql
 - **races-clock-schema** [done] (.kb/cards/races-clock-schema.md) Migrations 17-18 : apparition, limites et équipement de départ par race, horloge du monde, trigger de création aligné — Migrations 17 et 18 : réglages des races (zone d'apparition, limites, équipement de départ), horloge du monde persistante, et trigger de création de personnage aligné sur ces réglages avec exemption d — files: db/17_races_apparition_horloge.sql, db/18_depart_par_race.sql
 - **rank-up-schema** [done] (.kb/cards/rank-up-schema.md) Migrations 21 et 24 : passage de rang (deux voies), rang temporaire, réapparition des monstres — Migration 21 : conditions de passage par rang et rang temporaire en cours. — files: db/21_passage_de_rang.sql, db/24_rangs_respawn.sql
 - **recipes-shop-schema** [done] (.kb/cards/recipes-shop-schema.md) Migration 19 : boutique par race et recettes de parchemins — Migration 19 : boutique de l'hôtel de ville par race (objets, sorts) et table des recettes de parchemins. — files: db/19_boutique_parchemins.sql
@@ -55,6 +56,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - `db/22_batiments.sql`
 - `db/23_gisements.sql`
 - `db/24_rangs_respawn.sql`
+- `db/25_monstres_montures.sql`
 - `docker-compose.dev.yml` — DEV — projet "angemoniaque-dev" : conteneurs ange-dev-*, base/volumes/réseau séparés de la prod, ports différe
 - `docker-compose.prod.yml` — PROD — projet "angemoniaque-prod" : conteneurs ange-prod-*, volumes et réseau propres, images :prod
 - `docker-compose.yml` — Dépôt infra : orchestre TOUT (db, cache, back, front, proxy, outils). Les dépôts backend/ et frontend/ sont cl
