@@ -16,7 +16,8 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - tests SQL (psql requis) : `scripts/check-sql.sh` ; backup : `scripts/backup-db.sh [dev|prod]`
 - kb : backend d'embedding `hash` (offline) dans `.kb/config.json`
 
-## Features (15)
+## Features (16)
+- **building-activation-schema** [done] (.kb/cards/building-activation-schema.md) Migration 28 : conditions d activation des bâtiments — Migration 28 : conditions d'activation de la capacité d'un bâtiment. — files: db/28_activation_batiments.sql
 - **buildings-schema** [done] (.kb/cards/buildings-schema.md) Migration 22 : bâtiments paramétrables et unicité des cases séparée — Migration 22 : colonnes des bâtiments paramétrables et séparation de l'unicité des cases (entités / bâtiments). — files: db/22_batiments.sql
 - **deposits-schema** [done] (.kb/cards/deposits-schema.md) Migration 23 : gisements de ressources — Migration 23 : table des gisements de ressources. — files: db/23_gisements.sql
 - **divine-families-schema** [done] (.kb/cards/divine-families-schema.md) Familles divines (migration 16) : divine_families, items.divine_family, divine_items.item_id — Migration 16 : objets divins gérés comme les autres objets (ligne `items` de rareté divin) et familles libres au-delà de relique / arcane / artefact, chacune avec un plafond d'exemplaires. — files: db/16_familles_divines.sql
@@ -61,6 +62,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - `db/25_monstres_montures.sql`
 - `db/26_objets_caracteristiques.sql`
 - `db/27_invocations_liens.sql`
+- `db/28_activation_batiments.sql`
 - `docker-compose.dev.yml` — DEV — projet "angemoniaque-dev" : conteneurs ange-dev-*, base/volumes/réseau séparés de la prod, ports différe
 - `docker-compose.prod.yml` — PROD — projet "angemoniaque-prod" : conteneurs ange-prod-*, volumes et réseau propres, images :prod
 - `docker-compose.yml` — Dépôt infra : orchestre TOUT (db, cache, back, front, proxy, outils). Les dépôts backend/ et frontend/ sont cl
