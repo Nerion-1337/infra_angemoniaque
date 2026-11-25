@@ -4,6 +4,7 @@ slug: item-stats-schema
 status: done
 updated: 2026-11-25
 files:
+  - db/36_portee_armes.sql
   - db/26_objets_caracteristiques.sql
   - db/32_equipement_carte.sql
   - db/34_taille_coffre.sql
@@ -23,6 +24,7 @@ d'armure magique pour l'occupant d'un bâtiment.
 - Idempotente.
 - Migration 32 : `items.two_handed` (arcs et `data.hands = 2` repris) ; types « bow / mains / tete / torse / pieds / collier / bague » ramenés à weapon / head / chest / foot / amulet / ring ; un arc équipé passe en main principale si les deux mains sont libres, sinon au sac ; `characters.map_upgrade` ; `game_config.map_upgrade_price` = 500. Idempotente.
 - Migration 34 : `monsters.size` (1 à 3, défaut 1).
+- Migration 36 : `items.reach` (1 à 20, défaut 1) et `items.full_power_at` (NULL ou 1 ≤ N < reach, CHECK `chk_item_reach`).
 
 ## Gotchas
 - Le retrait utilise `applied`, jamais les bonus actuels de l'objet (l'admin peut les avoir changés entre-temps).
