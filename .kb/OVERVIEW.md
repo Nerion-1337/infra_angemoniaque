@@ -16,9 +16,10 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - tests SQL (psql requis) : `scripts/check-sql.sh` ; backup : `scripts/backup-db.sh [dev|prod]`
 - kb : backend d'embedding `hash` (offline) dans `.kb/config.json`
 
-## Features (18)
+## Features (19)
 - **building-activation-schema** [done] (.kb/cards/building-activation-schema.md) Migration 28 : conditions d activation des bâtiments — Migration 28 : conditions d'activation de la capacité d'un bâtiment. — files: db/28_activation_batiments.sql
 - **buildings-schema** [done] (.kb/cards/buildings-schema.md) Migration 22 : bâtiments paramétrables et unicité des cases séparée — Migration 22 : colonnes des bâtiments paramétrables et séparation de l'unicité des cases (entités / bâtiments). — files: db/22_batiments.sql
+- **creature-look-schema** [done] (.kb/cards/creature-look-schema.md) Migration 41 : design 3D et icône des types de monstres — Design 3D et icône d'un type de monstre (admin « Monstres »). — files: db/41_designs_icones.sql
 - **deposits-schema** [done] (.kb/cards/deposits-schema.md) Migrations 23, 30, 31 : secteurs de ressources, leurs ressources, conditions de récolte — Migrations 23 et 30 : secteurs de ressources (zone d'un monde) et leurs ressources. — files: db/23_gisements.sql, db/30_secteurs_ressources.sql, db/31_conditions_recolte.sql, db/33_sac_ressources.sql
 - **divine-families-schema** [done] (.kb/cards/divine-families-schema.md) Familles divines (migration 16) : divine_families, items.divine_family, divine_items.item_id — Migration 16 : objets divins gérés comme les autres objets (ligne `items` de rareté divin) et familles libres au-delà de relique / arcane / artefact, chacune avec un plafond d'exemplaires. — files: db/16_familles_divines.sql
 - **docker-infrastructure** [done] (.kb/cards/docker-infrastructure.md) Docker orchestration: dev/prod stacks, Nginx proxy, Postgres migrations — Orchestration Docker du projet : environnements dev et prod indépendants (Postgres 16, Redis 7, backend, frontend, Nginx, outils), migrations SQL ordonnées du schéma `game_schema`, scripts d'exploitat — files: docker-compose.yml, docker-compose.dev.yml, docker-compose.prod.yml, nginx/nginx.conf (+12)
@@ -77,6 +78,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - `db/38_carte_par_monde.sql`
 - `db/39_connexion_google.sql`
 - `db/40_forum_annonces.sql`
+- `db/41_designs_icones.sql`
 - `docker-compose.dev.yml` — DEV — projet "angemoniaque-dev" : conteneurs ange-dev-*, base/volumes/réseau séparés de la prod, ports différe
 - `docker-compose.prod.yml` — PROD — projet "angemoniaque-prod" : conteneurs ange-prod-*, volumes et réseau propres, images :prod
 - `docker-compose.yml` — Dépôt infra : orchestre TOUT (db, cache, back, front, proxy, outils). Les dépôts backend/ et frontend/ sont cl

@@ -1,17 +1,17 @@
 # Graph Report - infra  (2026-11-26)
 
 ## Corpus Check
-- 50 files · ~13,819 words
+- 51 files · ~14,053 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 7 file(s) not represented in the graph (top: (none) 5, .conf 2)
 
 ## Summary
-- 225 nodes · 231 edges · 19 communities (16 shown, 3 thin omitted)
+- 226 nodes · 232 edges · 19 communities (16 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `659a9657`
+- Built from commit: `ec9084ff`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -32,8 +32,8 @@
 - postgres
 - AGENTS.md — ia_agent / infra
 - migrate.sh
+- angemoniaque-infra — DEV et PROD indépendants (aucun Node sur l'hôte)
 - check-sql.sh
-- README.md
 - backup-db.sh
 
 ## God Nodes (most connected - your core abstractions)
@@ -135,10 +135,10 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `services` be split into smaller, more focused modules?**
   _Cohesion score 0.08695652173913043 - nodes in this community are weakly interconnected._
 - **Why does `services` connect `services` to `migrator`, `postgres`, `backend`?**
-  _High betweenness centrality (0.066) - this node is a cross-community bridge._
+  _High betweenness centrality (0.065) - this node is a cross-community bridge._
 - **Should `services` be split into smaller, more focused modules?**
   _Cohesion score 0.09090909090909091 - nodes in this community are weakly interconnected._
 - **Why does `backend` connect `backend` to `services`, `frontend`, `migrator`?**
-  _High betweenness centrality (0.031) - this node is a cross-community bridge._
+  _High betweenness centrality (0.030) - this node is a cross-community bridge._
 - **Should `services` be split into smaller, more focused modules?**
   _Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected._
