@@ -10,7 +10,7 @@ files:
   - nginx/nginx.conf
   - nginx/nginx.dev.conf
   - docker-compose.prod.yml
-  - .env.example
+  - README.md
 symbols:
   - 
 tests:
@@ -24,7 +24,7 @@ Schéma de la carte des ressources par monde (38), de la connexion Google (39), 
 - 39 : `accounts.google_sub` (unique si non NULL) ; `password_hash` peut être NULL (compte Google).
 - 40 : `forum_categories` (kind, read_access, post_access, races, min_rank, locked, hidden ; CHECK des valeurs), `forum_topics`, `forum_posts`, `forum_reports` (un par membre et par message), `legal_pages` (clé, titre, texte, version) ; `accounts.tos_version`, `tos_accepted_at`, `forum_muted_until` ; 8 catégories et 5 pages légales d'exemple (mentions légales à compléter entre crochets).
 - Nginx (dev et prod) : `X-Forwarded-Host $http_host` et `X-Forwarded-Proto $scheme` vers le back (adresse de retour Google).
-- Prod : `GOOGLE_MOCK: "0"` forcé sur le back (jamais de connexion Google simulée) ; `.env.example` documente GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, PUBLIC_URL.
+- Prod : `GOOGLE_MOCK: "0"` forcé sur le back (jamais de connexion Google simulée) ; `README.md` (section « Connexion avec Google ») documente GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, PUBLIC_URL et l'URI de redirection (`.env.example` n'est pas modifiable par l'agent : garde-fou de gitsave).
 
 ## Gotchas
 - Migrations idempotentes : 38 teste l'existence de `map_upgrade` avant de la reprendre ; les graines ne s'insèrent que si la table est vide / la clé absente.
