@@ -27,7 +27,8 @@ services:
     image: angemoniaque-backend:prod
     build: { context: "${BACKEND_PATH:-../backend}" }
     env_file: .env
-    environment: { DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}", REDIS_URL: "redis://redis:6379" }
+    # GOOGLE_MOCK=0 : jamais de connexion Google simulée en production (sans clés Google, le bouton est désactivé).
+    environment: { DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}", REDIS_URL: "redis://redis:6379", GOOGLE_MOCK: "0" }
     depends_on: { postgres: { condition: service_healthy }, redis: { condition: service_healthy } }
   frontend:
     container_name: ange-prod-frontend
