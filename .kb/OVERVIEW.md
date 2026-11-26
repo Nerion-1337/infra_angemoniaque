@@ -16,7 +16,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - tests SQL (psql requis) : `scripts/check-sql.sh` ; backup : `scripts/backup-db.sh [dev|prod]`
 - kb : backend d'embedding `hash` (offline) dans `.kb/config.json`
 
-## Features (21)
+## Features (22)
 - **building-activation-schema** [done] (.kb/cards/building-activation-schema.md) Migration 28 : conditions d activation des bâtiments — Migration 28 : conditions d'activation de la capacité d'un bâtiment. — files: db/28_activation_batiments.sql
 - **buildings-schema** [done] (.kb/cards/buildings-schema.md) Migration 22 : bâtiments paramétrables et unicité des cases séparée — Migration 22 : colonnes des bâtiments paramétrables et séparation de l'unicité des cases (entités / bâtiments). — files: db/22_batiments.sql
 - **creature-look-schema** [done] (.kb/cards/creature-look-schema.md) Migration 41 : design 3D et icône des types de monstres — Design 3D et icône d'un type de monstre (admin « Monstres »). — files: db/41_designs_icones.sql
@@ -24,6 +24,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - **divine-energy-cost-schema** [done] (.kb/cards/divine-energy-cost-schema.md) Migration 42 : colonnes divine_energy_cost (sorts, recettes, cases) — Ajoute le coût en énergie divine, à côté du coût en énergie, aux sorts, recettes de parchemin et types de case. — files: db/42_energie_divine_couts.sql
 - **divine-families-schema** [done] (.kb/cards/divine-families-schema.md) Familles divines (migration 16) : divine_families, items.divine_family, divine_items.item_id — Migration 16 : objets divins gérés comme les autres objets (ligne `items` de rareté divin) et familles libres au-delà de relique / arcane / artefact, chacune avec un plafond d'exemplaires. — files: db/16_familles_divines.sql
 - **docker-infrastructure** [done] (.kb/cards/docker-infrastructure.md) Docker orchestration: dev/prod stacks, Nginx proxy, Postgres migrations — Orchestration Docker du projet : environnements dev et prod indépendants (Postgres 16, Redis 7, backend, frontend, Nginx, outils), migrations SQL ordonnées du schéma `game_schema`, scripts d'exploitat — files: docker-compose.yml, docker-compose.dev.yml, docker-compose.prod.yml, nginx/nginx.conf (+13)
+- **faith-pact-schema** [done] (.kb/cards/faith-pact-schema.md) Migration 44 : compositions de pacte, pactes par rang, prières, réglages de la foi et des pactes — Schéma de la foi et des pactes réglés en admin. — files: db/44_foi_pactes.sql
 - **forum-google-schema** [done] (.kb/cards/forum-google-schema.md) Migrations 38-40 : carte des ressources par monde, connexion Google, forum et pages légales — Schéma de la carte des ressources par monde (38), de la connexion Google (39), du forum public et des pages légales (40) ; en-têtes Nginx et réglages d'environnement associés. — files: db/38_carte_par_monde.sql, db/39_connexion_google.sql, db/40_forum_annonces.sql, nginx/nginx.conf (+3)
 - **item-stats-schema** [done] (.kb/cards/item-stats-schema.md) Migration 26 : bonus de caractéristiques des objets (trigger trg_item_bonus), armure magique de base — Migration 26 : bonus de caractéristiques des objets reportés sur la fiche du personnage, armure magique de base, bonus d'armure magique pour l'occupant d'un bâtiment. — files: db/37_puissance_distance.sql, db/36_portee_armes.sql, db/26_objets_caracteristiques.sql, db/32_equipement_carte.sql (+1)
 - **monster-mounts-schema** [done] (.kb/cards/monster-mounts-schema.md) Migration 25 : monstres servant de monture (projection mounts, trigger sync_mount) — **Historique : tables et triggers supprimés par la migration 43 (card `summon-ride-schema`).** Migration 25 : fusion monstres / montures. — files: db/35_xp_reapparition.sql, db/25_monstres_montures.sql
@@ -83,6 +84,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - `db/41_designs_icones.sql`
 - `db/42_energie_divine_couts.sql`
 - `db/43_invocations_montees.sql`
+- `db/44_foi_pactes.sql`
 - `docker-compose.dev.yml` — DEV — projet "angemoniaque-dev" : conteneurs ange-dev-*, base/volumes/réseau séparés de la prod, ports différe
 - `docker-compose.prod.yml` — PROD — projet "angemoniaque-prod" : conteneurs ange-prod-*, volumes et réseau propres, images :prod
 - `docker-compose.yml` — Dépôt infra : orchestre TOUT (db, cache, back, front, proxy, outils). Les dépôts backend/ et frontend/ sont cl
