@@ -2,7 +2,7 @@
 title: Migration 29 : montures invocables à pied, équipement des montures
 slug: mount-call-schema
 status: done
-updated: 2026-11-25
+updated: 2026-11-26
 files:
   - db/29_montures_invocables.sql
 symbols:
@@ -11,7 +11,7 @@ tests:
   - scripts/check-sql.sh
 ---
 ## Purpose
-Migration 29 : identifiant des montures possédées, lien invocation → monture / type de monstre, équipement des montures,
+**Historique : tables et triggers supprimés par la migration 43 (card `summon-ride-schema`).** Migration 29 : identifiant des montures possédées, lien invocation → monture / type de monstre, équipement des montures,
 retour des PV et de l'énergie au renvoi.
 
 ## Business rules

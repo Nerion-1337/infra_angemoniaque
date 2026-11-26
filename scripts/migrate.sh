@@ -49,9 +49,15 @@ marker() {
     12_monstre_details.sql) echo "SELECT to_regclass('game_schema.monster_spells') IS NOT NULL";;
     13_monstre_capacites.sql) echo "SELECT to_regclass('game_schema.monster_auras') IS NULL";;
     14_rarete_acquisition.sql) echo "SELECT EXISTS (SELECT 1 FROM information_schema.columns c JOIN information_schema.tables t ON t.table_name=c.table_name AND t.table_schema='game_schema' WHERE c.table_name='spells' AND c.column_name='usable_by')";;
+    43_invocations_montees.sql) echo "SELECT EXISTS (SELECT 1 FROM information_schema.columns c WHERE c.table_schema='game_schema' AND c.table_name='characters' AND c.column_name='riding_summon_id')";;
     *)                  echo "SELECT false";;  # nouveau fichier : pas de marqueur, appliqué s'il manque
   esac
 }
+
+# Volume NEUF : l'entrypoint Postgres vient de jouer TOUS les fichiers (journal vide + effet du 43 présent). On les enregistre
+# tous sans rien rejouer : rejouer un ancien fichier après le 43 (qui supprime les montures) échouerait.
+FRESH=no
+if [ "$(PSQL -tAc "SELECT count(*) FROM game_schema.schema_migrations")" = "0" ] && [ "$(PSQL -tAc "$(marker 43_invocations_montees.sql)")" = "t" ]; then FRESH=yes; fi
 
 for f in "$MIGRATIONS"/*.sql; do
   n=$(basename "$f")
@@ -60,7 +66,7 @@ for f in "$MIGRATIONS"/*.sql; do
     echo "ok (applied) $n"
     continue
   fi
-  mres=$(PSQL -tAc "$(marker "$n")")
+  if [ "$FRESH" = "yes" ]; then mres=t; else mres=$(PSQL -tAc "$(marker "$n")"); fi
   if [ "$mres" = "t" ]; then
     echo "ok (marker)  $n — baseline"
     PSQL -q -v ON_ERROR_STOP=1 -c "INSERT INTO game_schema.schema_migrations (name) VALUES ('$n');"

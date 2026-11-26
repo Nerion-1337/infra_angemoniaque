@@ -2,7 +2,7 @@
 title: Migration 25 : monstres servant de monture (projection mounts, trigger sync_mount)
 slug: monster-mounts-schema
 status: done
-updated: 2026-11-25
+updated: 2026-11-26
 files:
   - db/35_xp_reapparition.sql
   - db/25_monstres_montures.sql
@@ -12,7 +12,7 @@ tests:
   - scripts/check-sql.sh
 ---
 ## Purpose
-Migration 25 : fusion monstres / montures. Colonnes de monture sur `monsters`, lien 1:1 `mounts.monster_id`, reprise des
+**Historique : tables et triggers supprimés par la migration 43 (card `summon-ride-schema`).** Migration 25 : fusion monstres / montures. Colonnes de monture sur `monsters`, lien 1:1 `mounts.monster_id`, reprise des
 montures existantes en types de monstres, trigger de projection.
 
 ## Business rules
