@@ -20,6 +20,7 @@ files:
   - scripts/backup-db.sh
   - Makefile
   - .env.example
+  - README.md
 symbols:
   - docker-compose.dev.yml:angemoniaque-dev
   - docker-compose.prod.yml:angemoniaque-prod
@@ -52,6 +53,8 @@ migrations SQL ordonnées du schéma `game_schema`, scripts d'exploitation et Ma
 - Le Makefile est le point d'entrée unique (`dev-up`, `prod-up`, `dev-migrate`, `test-*`…).
 
 - Nginx transmet `X-Forwarded-Host` / `X-Forwarded-Proto` au back (retour de la connexion Google) ; la prod force `GOOGLE_MOCK=0` (pas de connexion Google simulée).
+- Nginx : `X-Real-IP $remote_addr` vers le back (limitation de débit) ; code admin servi après `auth_request` vers `/auth/admin-asset` (`/assets-admin/` en prod, `/src/admin/` en dev) ; prod : CSP (scripts du site, polices Google), X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy, server_tokens off.
+- README : section Sécurité (JWT_SECRET, amorçage admin, débit, anti-robot).
 ## Gotchas
 - Nginx résout `backend` / `frontend` par le DNS Docker (`resolver 127.0.0.11 valid=10s`) avec des variables dans `proxy_pass` : un conteneur recréé par `up -d --build` change d'IP ; avec un nom fixe, Nginx gardait l'ancienne adresse → 502 à la connexion jusqu'à son redémarrage (reproduit puis corrigé le 2026-11-25). Avec une variable, le préfixe `/api` est retiré par `rewrite … break` (paramètres conservés).
 - Copies Windows (CRLF) : le migrator retire les `\r` (`sed 's/\r$$//'`, `$$` = échappement compose) avant d'exécuter `migrate.sh` ; `.gitattributes` (eol=lf) ne réécrit pas les fichiers déjà extraits.

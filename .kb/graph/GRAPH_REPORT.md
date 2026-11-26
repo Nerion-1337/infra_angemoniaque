@@ -1,17 +1,17 @@
 # Graph Report - infra  (2026-11-26)
 
 ## Corpus Check
-- 51 files · ~14,053 words
+- 51 files · ~14,252 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 7 file(s) not represented in the graph (top: (none) 5, .conf 2)
 
 ## Summary
-- 226 nodes · 232 edges · 19 communities (16 shown, 3 thin omitted)
+- 227 nodes · 233 edges · 19 communities (17 shown, 2 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ec9084ff`
+- Built from commit: `ac979f30`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -54,7 +54,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (19 total, 3 thin omitted)
+## Communities (19 total, 2 thin omitted)
 
 ### Community 0 - "services"
 Cohesion: 0.09
@@ -120,16 +120,20 @@ Nodes (5): AGENTS.md — ia_agent / infra, Interfaces avec les autres dépôts, 
 Cohesion: 0.60
 Nodes (4): marker(), PGPASSWORD, PSQL(), migrate.sh script
 
+### Community 16 - "angemoniaque-infra — DEV et PROD indépendants (aucun Node sur l'hôte)"
+Cohesion: 0.50
+Nodes (3): angemoniaque-infra — DEV et PROD indépendants (aucun Node sur l'hôte), Connexion avec Google, Sécurité (anti-spam, anti-robot, accès admin)
+
 ## Knowledge Gaps
 - **2 isolated node(s):** `PGPASSWORD`, `PGPASSWORD`
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 135 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 136 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **2 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `services` connect `services` to `frontend`, `backend`, `migrator`, `postgres`?**
-  _High betweenness centrality (0.070) - this node is a cross-community bridge._
+  _High betweenness centrality (0.069) - this node is a cross-community bridge._
 - **What connects `PGPASSWORD`, `PGPASSWORD` to the rest of the system?**
   _2 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `services` be split into smaller, more focused modules?**
