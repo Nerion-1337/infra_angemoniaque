@@ -16,7 +16,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - tests SQL (psql requis) : `scripts/check-sql.sh` ; backup : `scripts/backup-db.sh [dev|prod]`
 - kb : backend d'embedding `hash` (offline) dans `.kb/config.json`
 
-## Features (25)
+## Features (26)
 - **activations-xp-schema** [done] (.kb/cards/activations-xp-schema.md) Migration 49 : XP totale accumulée, structure visible, éléments d'activation des structures — Schéma de l'activation générique des structures, de l'XP totale accumulée par joueur et de la visibilité des structures sur la carte. — files: db/49_activations_xp_totale.sql
 - **building-activation-schema** [done] (.kb/cards/building-activation-schema.md) Migration 28 : conditions d activation des bâtiments — Migration 28 : conditions d'activation de la capacité d'un bâtiment. — files: db/28_activation_batiments.sql
 - **buildings-schema** [done] (.kb/cards/buildings-schema.md) Migration 22 : bâtiments paramétrables et unicité des cases séparée — Migration 22 : colonnes des bâtiments paramétrables et séparation de l'unicité des cases (entités / bâtiments). — files: db/22_batiments.sql
@@ -37,6 +37,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - **schema-migrations-catchup** [done] (.kb/cards/schema-migrations-catchup.md) Rattrapage des migrations sur volume existant (service migrator) — Rattrapage des migrations sur un volume Postgres déjà créé (dev/prod) : le service `migrator` applique les fichiers `db/*.sql` manquants à chaque `make dev-up` / `prod-up`, sans casser un volume parti — files: scripts/migrate.sh, docker-compose.dev.yml, docker-compose.prod.yml, Makefile (+3)
 - **spell-engine-schema** [done] (.kb/cards/spell-engine-schema.md) Migration 20 : effets de sort, dégâts sur la durée, liens sort ↔ entités — Migration 20 : colonne des effets de sort, dégâts sur la durée en cours, liens sort ↔ objet / bâtiment (les liens « monture » sont retirés par la migration 43). — files: db/20_moteur_sorts.sql
 - **spell-summon-schema** [done] (.kb/cards/spell-summon-schema.md) Migration 27 : modes des sorts liés (au coup porté, à l attaque reçue) et invocations temporaires — Migration 27 : modes d'application des sorts liés à un élément et suivi des invocations temporaires. — files: db/27_invocations_liens.sql
+- **struct-types-schema** [done] (.kb/cards/struct-types-schema.md) Migration 50 : types de structures (héritage), apparence, or du coffre — Schéma des types de structures (réglages globaux suivis par les structures posées), de l'apparence et de l'or déposé au coffre. — files: db/50_types_structures_or_coffre.sql
 - **structures-gates-schema** [done] (.kb/cards/structures-gates-schema.md) Migration 48 : zones et réapparition des structures, portes des mondes, Royaume des Morts 150 × 150, pactes des demi-dieux, règles générales — Schéma du lot du 2026-11-28 : zones autour des structures (paix, sans construction), reconstruction des structures détruites, portes des mondes activables, Royaume des Morts agrandi avec sa porte cent — files: db/48_structures_portes.sql
 - **summon-ride-schema** [done] (.kb/cards/summon-ride-schema.md) Migration 43 : fin des montures, monte des invocations, délais de relance ; migrateur sur volume neuf — Supprime tout ce qui touchait aux montures (décision de l'humain du 2026-11-26) et ajoute la monte d'une invocation et les délais de relance des sorts. — files: db/43_invocations_montees.sql, scripts/migrate.sh
 - **tile-types-schema** [done] (.kb/cards/tile-types-schema.md) Table tile_types (migration 15) : types de case par monde — Table `tile_types` (migration 15) : un type de case par (monde, kind) avec nom, description, coût d'énergie et sort passif, éditée par la section admin « Cases ». — files: db/15_types_de_case.sql
@@ -93,6 +94,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - `db/47_xp_defauts_structures.sql`
 - `db/48_structures_portes.sql`
 - `db/49_activations_xp_totale.sql`
+- `db/50_types_structures_or_coffre.sql`
 - `docker-compose.dev.yml` — DEV — projet "angemoniaque-dev" : conteneurs ange-dev-*, base/volumes/réseau séparés de la prod, ports différe
 - `docker-compose.prod.yml` — PROD — projet "angemoniaque-prod" : conteneurs ange-prod-*, volumes et réseau propres, images :prod
 - `docker-compose.yml` — Dépôt infra : orchestre TOUT (db, cache, back, front, proxy, outils). Les dépôts backend/ et frontend/ sont cl
