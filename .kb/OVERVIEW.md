@@ -16,7 +16,8 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - tests SQL (psql requis) : `scripts/check-sql.sh` ; backup : `scripts/backup-db.sh [dev|prod]`
 - kb : backend d'embedding `hash` (offline) dans `.kb/config.json`
 
-## Features (24)
+## Features (25)
+- **activations-xp-schema** [done] (.kb/cards/activations-xp-schema.md) Migration 49 : XP totale accumulée, structure visible, éléments d'activation des structures — Schéma de l'activation générique des structures, de l'XP totale accumulée par joueur et de la visibilité des structures sur la carte. — files: db/49_activations_xp_totale.sql
 - **building-activation-schema** [done] (.kb/cards/building-activation-schema.md) Migration 28 : conditions d activation des bâtiments — Migration 28 : conditions d'activation de la capacité d'un bâtiment. — files: db/28_activation_batiments.sql
 - **buildings-schema** [done] (.kb/cards/buildings-schema.md) Migration 22 : bâtiments paramétrables et unicité des cases séparée — Migration 22 : colonnes des bâtiments paramétrables et séparation de l'unicité des cases (entités / bâtiments). — files: db/22_batiments.sql
 - **creature-look-schema** [done] (.kb/cards/creature-look-schema.md) Migration 41 : design 3D et icône des types de monstres — Design 3D et icône d'un type de monstre (admin « Monstres »). — files: db/41_designs_icones.sql
@@ -91,6 +92,7 @@ _Généré par `kb overview` — ne pas éditer ici ; notes manuelles dans `.kb/
 - `db/46_couches_portee_xp.sql`
 - `db/47_xp_defauts_structures.sql`
 - `db/48_structures_portes.sql`
+- `db/49_activations_xp_totale.sql`
 - `docker-compose.dev.yml` — DEV — projet "angemoniaque-dev" : conteneurs ange-dev-*, base/volumes/réseau séparés de la prod, ports différe
 - `docker-compose.prod.yml` — PROD — projet "angemoniaque-prod" : conteneurs ange-prod-*, volumes et réseau propres, images :prod
 - `docker-compose.yml` — Dépôt infra : orchestre TOUT (db, cache, back, front, proxy, outils). Les dépôts backend/ et frontend/ sont cl
